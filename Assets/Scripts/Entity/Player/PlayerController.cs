@@ -5,10 +5,12 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using Weapon;
 
-namespace Player
+namespace Entity.Player
 {
-    public class PlayerController : NetworkBehaviour
+
+    public class PlayerController : NetworkBehaviour, IDamageable
     {
+        
         [Header("Player Object")]
         [SerializeField] private GameObject playerObject;
         [SerializeField] private CharacterController playerController;
@@ -32,21 +34,22 @@ namespace Player
         
         [Header("Settings")]
         [SerializeField] private float speed;
-        [SerializeField] private bool isUsingMouse;
-
         [SerializeField] private float rotationSpeed = 0.25f;
         [SerializeField] private float gravity = -9.81f;
-
+        
+        public bool IsUsingMouse { get; private set; }
+        public bool IsLocal { get; private set; }
+        public Vector3 RotationTarget { get; private set; }
+        
         private bool _isGrounded;
-        private bool _ready = false;
+        private bool _ready;
 
         private Vector2 _movement;
         private Vector2 _mouseLook;
         private Vector2 _gamepadLook;
 
         private Vector3 _velocity;
-        private Vector3 _rotationTarget;
-        
+
         public void OnMove(InputAction.CallbackContext context)
         {
             _movement = context.ReadValue<Vector2>();
@@ -54,24 +57,30 @@ namespace Player
 
         public void OnMouseLook(InputAction.CallbackContext context)
         {
-            if (!isUsingMouse) isUsingMouse = true;
+            if (!IsUsingMouse) IsUsingMouse = true;
             _mouseLook = context.ReadValue<Vector2>();
         }
 
         public void OnGamepadLook(InputAction.CallbackContext context)
         {
-            if (isUsingMouse) isUsingMouse = false;
+            if (IsUsingMouse) IsUsingMouse = false;
             _gamepadLook = context.ReadValue<Vector2>();
         }
 
         public override void OnNetworkDespawn()
         {
-            LocalPlayer.Instance.Disable();
+            if (IsOwner)
+            {
+                LocalPlayer.Instance.Disable();   
+            }
         }
 
         public override void OnNetworkSpawn()
         {
-            if(IsOwner) {
+            if(IsOwner)
+            {
+                IsLocal = true;
+                
                 LocalPlayer localPlayer = LocalPlayer.Instance;
                 localPlayer.Activate();
                 localPlayer.BindCamera(gameObject);
@@ -79,9 +88,20 @@ namespace Player
                 crosshairObject = localPlayer.AimCrosshair;
                 camera = localPlayer.PlayerCamera;
 
+                gameObject.tag = "Local Player";
+
                 _ready = true;
                 GameLogger.Info("PlayerController ready");
             }
+            else
+            {
+                IsLocal = false;
+            }
+        }
+        
+        public void OnDamage(DamageCause damageCause, float damage)
+        {
+            GameLogger.Info("PlayerController hit with " + damage + " damage[" + damageCause + "]");
         }
 
         private void Start()
@@ -104,17 +124,15 @@ namespace Player
                 {
                     Destroy(destroyObject);
                 }
-                
-                
             }
             
             if(!_ready) return;
             
-            if (crosshairObject.activeSelf && !isUsingMouse)
+            if (crosshairObject.activeSelf && !IsUsingMouse)
             {
                 crosshairObject.SetActive(false);
                 weaponAim.Disable();
-            } else if (!crosshairObject.activeSelf && isUsingMouse)
+            } else if (!crosshairObject.activeSelf && IsUsingMouse)
             {
                 crosshairObject.SetActive(true);
             }
@@ -137,21 +155,21 @@ namespace Player
 
         private void RotatePlayer()
         {
-            if (isUsingMouse)
+            if (IsUsingMouse)
             {
                 if (Physics.Raycast(camera.ScreenPointToRay(_mouseLook), out var raycastHit, 100f, groundLayer))
                 {
-                    _rotationTarget = raycastHit.point;
-                    weaponAim.TargetLocation = _rotationTarget;
-                    crosshairObject.transform.SetPositionAndRotation(_rotationTarget, crosshairObject.transform.rotation);
+                    RotationTarget = raycastHit.point;
+                    weaponAim.TargetLocation = RotationTarget;
+                    crosshairObject.transform.SetPositionAndRotation(RotationTarget, crosshairObject.transform.rotation);
                 }
                 
                 // Rotate Player
-                var lookPosition = _rotationTarget - playerObject.transform.position;
+                var lookPosition = RotationTarget - playerObject.transform.position;
                 lookPosition.y = 0;
                 var rotation = Quaternion.LookRotation(lookPosition);
 
-                Vector3 aimDirection = new Vector3(_rotationTarget.x, 0f, _rotationTarget.z);
+                Vector3 aimDirection = new Vector3(RotationTarget.x, 0f, RotationTarget.z);
                 if (aimDirection != Vector3.zero)
                 {
                     playerObject.transform.rotation = Quaternion.Slerp(playerObject.transform.rotation, rotation, rotationSpeed);

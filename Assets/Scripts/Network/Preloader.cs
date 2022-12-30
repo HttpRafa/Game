@@ -5,6 +5,7 @@ using Logger;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Network
 {
@@ -14,8 +15,23 @@ namespace Network
         [SerializeField] private NetworkManager networkManager;
         [SerializeField] private UnityTransport networkTransport;
 
+        [SerializeField] private bool autoHost;
+        [SerializeField] private bool autoClient;
+        
         private void Start()
         {
+            if (autoHost)
+            {
+                networkManager.StartHost();
+                return;
+            }
+
+            if (autoClient)
+            {
+                networkManager.StartClient();
+                return;
+            }
+            
             string[] arguments = Environment.GetCommandLineArgs();
             Dictionary<ArgumentData, object> argumentData = new Dictionary<ArgumentData, object>();
             

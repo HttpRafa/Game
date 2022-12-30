@@ -1,10 +1,8 @@
-﻿using System;
-using Cinemachine;
+﻿using Cinemachine;
 using Logger;
 using UnityEngine;
-using UnityEngine.Serialization;
 
-namespace Player
+namespace Entity.Player
 {
     public class LocalPlayer : MonoBehaviour
     {
