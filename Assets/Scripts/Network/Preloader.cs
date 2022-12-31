@@ -20,18 +20,21 @@ namespace Network
         
         private void Start()
         {
-            if (autoHost)
+            if (Application.isEditor)
             {
-                networkManager.StartHost();
-                return;
+                if (autoHost)
+                {
+                    networkManager.StartHost();
+                    return;
+                }
+
+                if (autoClient)
+                {
+                    networkManager.StartClient();
+                    return;
+                }   
             }
 
-            if (autoClient)
-            {
-                networkManager.StartClient();
-                return;
-            }
-            
             string[] arguments = Environment.GetCommandLineArgs();
             Dictionary<ArgumentData, object> argumentData = new Dictionary<ArgumentData, object>();
             
@@ -70,6 +73,9 @@ namespace Network
                     case "-client":
                         argumentData.Add(ArgumentData.Client, null);
                         break;
+                    case "-host":
+                        argumentData.Add(ArgumentData.Host, null);
+                        break;
                 }
             }
             foreach (var (key, value) in argumentData)
@@ -104,6 +110,13 @@ namespace Network
                                     networkTransport.ConnectionData.Port + "]");
                     networkManager.StartClient();
                 }
+                if (argumentData.ContainsKey(ArgumentData.Host))
+                {
+                    GameLogger.Info("=> Host | Start");
+                    GameLogger.Info("Starting host[" + networkTransport.ConnectionData.Address + ":" +
+                                    networkTransport.ConnectionData.Port + "]");
+                    networkManager.StartHost();
+                }
             }
 #endif
             
@@ -114,7 +127,8 @@ namespace Network
             Address,
             Port,
             
-            Client
+            Client,
+            Host
         }
         
     }

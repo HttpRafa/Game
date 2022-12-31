@@ -59,7 +59,7 @@ namespace Weapon
                 if (playerController.IsUsingMouse)
                 {
                     Vector3 muzzlePosition = _selectedWeapon.MuzzleTransform.position;
-                    Vector3 shootDirection = ((playerController.RotationTarget + new Vector3(0, 1f, 0)) - muzzlePosition).normalized;
+                    Vector3 shootDirection = ((playerController.RotationTarget + Vector3.up) - muzzlePosition).normalized;
                     FireShoot(_selectedWeapon, muzzlePosition, shootDirection);
                 }
                 else
@@ -71,29 +71,29 @@ namespace Weapon
         
         private void FireShoot(Weapon weapon, Vector3 startPosition, Vector3 direction)
         {
-            SpawnBullet(true, startPosition, direction, weapon.WeaponData.bulletSpeed, weapon.WeaponData.damage);
-            SpawnBulletServerRpc(startPosition, direction, weapon.WeaponData.bulletSpeed, weapon.WeaponData.damage);
+            SpawnBullet(true, NetworkObjectId, startPosition, direction, weapon.WeaponData.bulletSpeed, weapon.WeaponData.damage);
+            SpawnBulletServerRpc(NetworkObjectId, startPosition, direction, weapon.WeaponData.bulletSpeed, weapon.WeaponData.damage);
         }
 
         [ServerRpc]
-        private void SpawnBulletServerRpc(Vector3 startPosition, Vector3 direction, float bulletSpeed, float damage)
+        private void SpawnBulletServerRpc(ulong ownerId, Vector3 startPosition, Vector3 direction, float bulletSpeed, float damage)
         {
-            SpawnBulletClientRpc(startPosition, direction, bulletSpeed, damage);
+            SpawnBulletClientRpc(ownerId, startPosition, direction, bulletSpeed, damage);
         }
 
         [ClientRpc]
-        private void SpawnBulletClientRpc(Vector3 startPosition, Vector3 direction, float bulletSpeed, float damage)
+        private void SpawnBulletClientRpc(ulong ownerId, Vector3 startPosition, Vector3 direction, float bulletSpeed, float damage)
         {
             if (!IsOwner)
             {
-                SpawnBullet(false, startPosition, direction, bulletSpeed, damage);
+                SpawnBullet(false, ownerId, startPosition, direction, bulletSpeed, damage);
             }
         }
 
-        private void SpawnBullet(bool owner, Vector3 startPosition, Vector3 direction, float bulletSpeed, float damage)
+        private void SpawnBullet(bool owner, ulong ownerId, Vector3 startPosition, Vector3 direction, float bulletSpeed, float damage)
         {
             Bullet bullet = Instantiate(bulletPrefab, startPosition, Quaternion.identity);
-            bullet.Setup(owner, direction, bulletSpeed, damage);
+            bullet.Setup(owner, ownerId, direction, bulletSpeed, damage);
         }
 
         public void ChangeWeapon(int index)
@@ -117,7 +117,7 @@ namespace Weapon
         {
             if (_enabled)
             {
-                Vector3 target = (playerController.RotationTarget + new Vector3(0, 1f, 0));
+                Vector3 target = (playerController.RotationTarget + Vector3.up);
                 
                 Gizmos.DrawSphere(target, 0.15f);
                 var position = _selectedWeapon.MuzzleTransform.position;

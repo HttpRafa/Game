@@ -51,7 +51,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   explosion: {fileID: -1547712303303708915, guid: 0df5ef7cd2c62ad49bef5dce75d365a2,
     type: 3}
-  rigidbody: {fileID: -421764461327074097}
+  destroyTime: 354
 --- !u!54 &-421764461327074097
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -103,7 +103,7 @@ TrailRenderer:
   m_RenderingLayerMask: 257
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 5d0831a8667b2bd4f9047e8cd63b0eac, type: 2}
+  - {fileID: 2100000, guid: d8644d31a36f05f44a4edab4ec6a0b4d, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

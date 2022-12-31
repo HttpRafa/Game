@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Logger;
 using Unity.Netcode;
 using UnityEngine;
@@ -11,8 +10,10 @@ namespace Entity.Player
 
     public class PlayerController : NetworkBehaviour, IDamageable
     {
-        public readonly NetworkVariable<float> NetHealth = new(writePerm: NetworkVariableWritePermission.Server);
+        public static PlayerController LocalPlayerController { get; private set; }
         
+        public readonly NetworkVariable<float> NetHealth = new(writePerm: NetworkVariableWritePermission.Server);
+
         [Header("Player Object")]
         [SerializeField] private GameObject playerObject;
         [SerializeField] private CharacterController playerController;
@@ -109,21 +110,45 @@ namespace Entity.Player
         
         public void OnDamage(DamageCause damageCause, float damage)
         {
-            HandleDamageServerRpc(damageCause, damage);
+            if(IsServer) return;
+            
+            PlayerController localPlayer = LocalPlayerController;
+            if (localPlayer != null)
+            {
+                localPlayer.ReportDamageToServer(NetworkObjectId, damageCause, damage);
+            }
         }
 
-        [ServerRpc]
-        private void HandleDamageServerRpc(DamageCause damageCause, float damage)
+        public void ReportDamageToServer(ulong objectId, DamageCause damageCause, float damage)
         {
-            float health = NetHealth.Value;
-            if ((health - damage) <= 0)
+            HandleDamageServerRpc(objectId, damageCause, damage);
+        }
+        
+        [ServerRpc]
+        private void HandleDamageServerRpc(ulong objectId, DamageCause damageCause, float damage)
+        {
+            PlayerController controller = null;
+            foreach (NetworkClient networkClient in NetworkManager.ConnectedClientsList)
             {
-                // Kill Player
-                NetHealth.Value = 0;
+                NetworkObject networkObject = networkClient.PlayerObject;
+                if (networkObject.NetworkObjectId == objectId)
+                {
+                    controller = networkObject.GetComponent<PlayerController>();
+                }
             }
-            else
+
+            if (controller != null)
             {
-                NetHealth.Value = health - damage;
+                float health = controller.NetHealth.Value;
+                if ((health - damage) <= 0)
+                {
+                    // Kill Player
+                    controller.NetHealth.Value = 0;
+                }
+                else
+                {
+                    controller.NetHealth.Value = health - damage;
+                }   
             }
         }
 

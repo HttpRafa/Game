@@ -17,11 +17,13 @@ namespace Entity.Bullet
 
         private float _damage;
         private bool _owner;
+        private ulong _ownerId;
 
-        public void Setup(bool owner, Vector3 direction, float bulletSpeed, float damage)
+        public void Setup(bool owner, ulong ownerId, Vector3 direction, float bulletSpeed, float damage)
         {
             _damage = damage;
             _owner = owner;
+            _ownerId = ownerId;
 
             // Apply force
             GetComponent<Rigidbody>().AddForce(direction * bulletSpeed, ForceMode.Impulse);
@@ -31,12 +33,13 @@ namespace Entity.Bullet
 
         private void OnCollisionEnter(Collision collision)
         {
+            if(collision.collider.GetComponent<Bullet>() != null) return;
+            PlayerController hitController = collision.collider.GetComponent<PlayerController>();
+            if(hitController != null && (hitController.IsLocal || hitController.NetworkObjectId == _ownerId)) return;
+            
             ContactPoint contactPoint = collision.GetContact(0);
             if (_owner)
             {
-                PlayerController hitController = collision.collider.GetComponent<PlayerController>();
-                if (hitController != null && hitController.IsLocal) return;
-                
                 Target target = collision.collider.GetComponent<Target>();
                 if (target != null)
                 {
