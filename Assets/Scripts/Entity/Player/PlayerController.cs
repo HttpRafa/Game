@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Logger;
 using Unity.Netcode;
 using UnityEngine;
@@ -10,6 +11,7 @@ namespace Entity.Player
 
     public class PlayerController : NetworkBehaviour, IDamageable
     {
+        public readonly NetworkVariable<float> NetHealth = new(writePerm: NetworkVariableWritePermission.Server);
         
         [Header("Player Object")]
         [SerializeField] private GameObject playerObject;
@@ -36,7 +38,8 @@ namespace Entity.Player
         [SerializeField] private float speed;
         [SerializeField] private float rotationSpeed = 0.25f;
         [SerializeField] private float gravity = -9.81f;
-        
+        [SerializeField] private float maxHealth = 100f;
+
         public bool IsUsingMouse { get; private set; }
         public bool IsLocal { get; private set; }
         public Vector3 RotationTarget { get; private set; }
@@ -77,6 +80,11 @@ namespace Entity.Player
 
         public override void OnNetworkSpawn()
         {
+            if (IsServer)
+            {
+                NetHealth.Value = maxHealth;
+            }
+            
             if(IsOwner)
             {
                 IsLocal = true;
@@ -101,7 +109,22 @@ namespace Entity.Player
         
         public void OnDamage(DamageCause damageCause, float damage)
         {
-            GameLogger.Info("PlayerController hit with " + damage + " damage[" + damageCause + "]");
+            HandleDamageServerRpc(damageCause, damage);
+        }
+
+        [ServerRpc]
+        private void HandleDamageServerRpc(DamageCause damageCause, float damage)
+        {
+            float health = NetHealth.Value;
+            if ((health - damage) <= 0)
+            {
+                // Kill Player
+                NetHealth.Value = 0;
+            }
+            else
+            {
+                NetHealth.Value = health - damage;
+            }
         }
 
         private void Start()

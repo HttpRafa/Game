@@ -1,13 +1,19 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
+using Effects;
 using Entity.Player;
 using UnityEngine;
 
 namespace Entity.Bullet
 {
+    
+    [RequireComponent(typeof(Rigidbody))]
     public class Bullet : MonoBehaviour
     {
+
+        [SerializeField] private Explosion explosion;
         
-        [SerializeField] private new Rigidbody rigidbody;
+        [SerializeField] private int destroyTime = 5;
 
         private float _damage;
         private bool _owner;
@@ -18,40 +24,49 @@ namespace Entity.Bullet
             _owner = owner;
 
             // Apply force
-            rigidbody.AddForce(direction * bulletSpeed, ForceMode.Impulse);
+            GetComponent<Rigidbody>().AddForce(direction * bulletSpeed, ForceMode.Impulse);
 
-            StartCoroutine(DestroyAfterTime(5));
+            StartCoroutine(DestroyAfterTime(destroyTime));
         }
 
-        private void OnTriggerEnter(Collider other)
+        private void OnCollisionEnter(Collision collision)
         {
+            ContactPoint contactPoint = collision.GetContact(0);
             if (_owner)
             {
-                PlayerController hitController = other.GetComponent<PlayerController>();
+                PlayerController hitController = collision.collider.GetComponent<PlayerController>();
                 if (hitController != null && hitController.IsLocal) return;
                 
-                Target target = other.GetComponent<Target>();
+                Target target = collision.collider.GetComponent<Target>();
                 if (target != null)
                 {
                     target.Hit(DamageCause.Bullet, _damage);
-                    Destroy(gameObject);
+                    BulletHit(contactPoint.point, contactPoint.normal);
                 }
                 else
                 {
-                    Destroy(gameObject);
+                    BulletHit(contactPoint.point, contactPoint.normal);
                 }
             }
             else
             {
-                Destroy(gameObject);
+                BulletHit(contactPoint.point, contactPoint.normal);
             }
+        }
+
+        private void BulletHit(Vector3 position, Vector3 forward)
+        {
+            Explosion explosionObject = Instantiate(explosion, position, Quaternion.identity);
+            if(forward != Vector3.zero) explosionObject.transform.forward = forward;
+            
+            Destroy(gameObject);
         }
 
         IEnumerator DestroyAfterTime(float time)
         {
             yield return new WaitForSeconds(time);
             
-            Destroy(gameObject);
+            BulletHit(transform.position, Vector3.zero);
         }
         
     }
