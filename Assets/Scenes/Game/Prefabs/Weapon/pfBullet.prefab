@@ -51,7 +51,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   explosion: {fileID: -1547712303303708915, guid: 0df5ef7cd2c62ad49bef5dce75d365a2,
     type: 3}
-  destroyTime: 354
+  destroyTime: 5
 --- !u!54 &-421764461327074097
 Rigidbody:
   m_ObjectHideFlags: 0
