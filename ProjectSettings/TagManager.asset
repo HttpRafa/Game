@@ -3,8 +3,7 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags:
-  - Local Player
+  tags: []
   layers:
   - Default
   - TransparentFX
@@ -13,11 +12,11 @@ TagManager:
   - Water
   - UI
   - Overlay
-  - 
-  - 
+  - Players
+  - Effects
   - 
   - Ground
-  - World
+  - 
   - 
   - 
   - 
