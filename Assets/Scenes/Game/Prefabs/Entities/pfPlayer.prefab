@@ -144,7 +144,6 @@ GameObject:
   - component: {fileID: 2758856168790426070}
   - component: {fileID: 2758856168790426073}
   - component: {fileID: 2758856168790426072}
-  - component: {fileID: 2758856168790426071}
   m_Layer: 7
   m_Name: Player Body
   m_TagString: Untagged
@@ -217,20 +216,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!136 &2758856168790426071
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2758856168790426069}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  m_Radius: 0.5
-  m_Height: 2
-  m_Direction: 1
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &2758856168874183255
 GameObject:
   m_ObjectHideFlags: 0
@@ -364,7 +349,6 @@ MonoBehaviour:
   speed: 7
   rotationSpeed: 0.25
   gravity: -9.81
-  maxHealth: 100
 --- !u!114 &2758856168874183261
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -660,7 +644,6 @@ GameObject:
   - component: {fileID: 2758856170759527210}
   - component: {fileID: 2758856170759527213}
   - component: {fileID: 2758856170759527212}
-  - component: {fileID: 2758856170759527211}
   m_Layer: 7
   m_Name: Player Face
   m_TagString: Untagged
@@ -733,19 +716,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &2758856170759527211
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2758856170759527209}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &4455662913749546573
 GameObject:
   m_ObjectHideFlags: 0

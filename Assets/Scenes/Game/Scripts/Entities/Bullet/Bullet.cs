@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using Scenes.Game.Scripts.Entities.Player.Logic;
 using Scenes.Game.Scripts.Enums;
+using Scenes.Global.Scripts.Logging;
 using UnityEngine;
 
 namespace Scenes.Game.Scripts.Entities.Bullet
@@ -32,10 +33,12 @@ namespace Scenes.Game.Scripts.Entities.Bullet
 
         private void OnCollisionEnter(Collision collision)
         {
+            GameLogger.Info(collision.collider.gameObject.name);
+            
             if(collision.collider.GetComponent<Bullet>() != null) return;
             PlayerController hitController = collision.collider.GetComponent<PlayerController>();
-            if(hitController != null && (hitController.IsLocal || hitController.NetworkObjectId == _ownerId)) return;
-            
+            if (hitController != null && hitController.NetworkObjectId == _ownerId) return;
+
             ContactPoint contactPoint = collision.GetContact(0);
             if (_owner)
             {

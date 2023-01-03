@@ -14,6 +14,7 @@ namespace Scenes.Game.Scripts.Entities.Player.Logic
         public static PlayerController LocalPlayerController { get; private set; }
         
         public readonly NetworkVariable<float> NetHealth = new(writePerm: NetworkVariableWritePermission.Server);
+        public readonly NetworkVariable<float> NetMaxHealth = new(writePerm: NetworkVariableWritePermission.Server);
 
         [Header("Player Object")]
         [SerializeField] private GameObject playerObject;
@@ -40,12 +41,11 @@ namespace Scenes.Game.Scripts.Entities.Player.Logic
         [SerializeField] private float speed;
         [SerializeField] private float rotationSpeed = 0.25f;
         [SerializeField] private float gravity = -9.81f;
-        [SerializeField] private float maxHealth = 100f;
 
         public bool IsUsingMouse { get; private set; }
         public bool IsLocal { get; private set; }
         public Vector3 RotationTarget { get; private set; }
-        
+
         private bool _isGrounded;
         private bool _ready;
 
@@ -82,22 +82,23 @@ namespace Scenes.Game.Scripts.Entities.Player.Logic
 
         public override void OnNetworkSpawn()
         {
-            transform.position += Vector3.up;
+            transform.position += Vector3.up * 5;
             
             if (IsServer)
             {
-                NetHealth.Value = maxHealth;
-                
-                
+                NetMaxHealth.Value = 100;
+                NetHealth.Value = NetMaxHealth.Value;
             }
             
             if(IsOwner)
             {
                 IsLocal = true;
+                LocalPlayerController = this;
                 
                 LocalPlayer localPlayer = LocalPlayer.Instance;
                 localPlayer.Activate();
                 localPlayer.BindCamera(gameObject);
+                localPlayer.SetupHud(this);
 
                 crossHairObject = localPlayer.AimCrosshair;
                 camera = localPlayer.PlayerCamera;
@@ -115,11 +116,10 @@ namespace Scenes.Game.Scripts.Entities.Player.Logic
         
         public void OnDamage(DamageCause damageCause, float damage)
         {
-            if(IsServer) return;
-            
             PlayerController localPlayer = LocalPlayerController;
             if (localPlayer != null)
             {
+                GameLogger.Info("Client detected hit on object[" + NetworkObjectId + "/" + damageCause + "#" + damage + "]");
                 localPlayer.ReportDamageToServer(NetworkObjectId, damageCause, damage);
             }
         }
@@ -132,6 +132,8 @@ namespace Scenes.Game.Scripts.Entities.Player.Logic
         [ServerRpc]
         private void HandleDamageServerRpc(ulong objectId, DamageCause damageCause, float damage)
         {
+            GameLogger.Info("Applying damage on object[" + objectId + "/" + damageCause + "#" + damage + "]");
+            
             PlayerController controller = null;
             foreach (NetworkClient networkClient in NetworkManager.ConnectedClientsList)
             {

@@ -1,4 +1,5 @@
 ﻿using Cinemachine;
+using Scenes.Game.Scripts.Hud;
 using Scenes.Global.Scripts.Logging;
 using UnityEngine;
 
@@ -14,6 +15,9 @@ namespace Scenes.Game.Scripts.Entities.Player.Logic
         [field:SerializeField] public Camera PlayerCamera { get; private set; }
         
         [SerializeField] private CinemachineVirtualCamera virtualCamera;
+        
+        [Header("Hud")]
+        [SerializeField] private HealthBar healthBar;
 
         private void Awake()
         {
@@ -40,5 +44,10 @@ namespace Scenes.Game.Scripts.Entities.Player.Logic
             GameLogger.Info("Updated VirtualCamera target");
         }
 
+        public void SetupHud(PlayerController playerController)
+        {
+            healthBar.Setup(playerController);
+        }
+        
     }
 }

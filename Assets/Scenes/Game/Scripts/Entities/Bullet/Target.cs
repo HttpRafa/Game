@@ -1,4 +1,5 @@
 ﻿using Scenes.Game.Scripts.Enums;
+using Scenes.Global.Scripts.Logging;
 using UnityEngine;
 
 namespace Scenes.Game.Scripts.Entities.Bullet
