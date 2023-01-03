@@ -2,7 +2,6 @@
 using Scenes.Game.Scripts.Entities.Player.Logic;
 using Scenes.Game.Scripts.Enums;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Scenes.Game.Scripts.Entities.Bullet
 {

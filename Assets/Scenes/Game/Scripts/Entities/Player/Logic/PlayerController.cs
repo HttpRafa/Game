@@ -82,9 +82,13 @@ namespace Scenes.Game.Scripts.Entities.Player.Logic
 
         public override void OnNetworkSpawn()
         {
+            transform.position += Vector3.up;
+            
             if (IsServer)
             {
                 NetHealth.Value = maxHealth;
+                
+                
             }
             
             if(IsOwner)
@@ -153,6 +157,26 @@ namespace Scenes.Game.Scripts.Entities.Player.Logic
             }
         }
 
+        [ClientRpc]
+        private void TeleportClientRpc(Vector3 position, Quaternion rotation)
+        {
+            var objectTransform = transform;
+            objectTransform.position = position;
+            objectTransform.rotation = rotation;
+        }
+
+        [ClientRpc]
+        private void TeleportClientRpc(Vector3 position)
+        {
+            transform.position = position;
+        }
+
+        [ClientRpc]
+        private void TeleportClientRpc(Quaternion rotation)
+        {
+            transform.rotation = rotation;
+        }
+        
         private void Start()
         {
             Cursor.visible = false;
