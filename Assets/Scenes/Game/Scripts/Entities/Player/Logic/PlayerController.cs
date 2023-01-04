@@ -89,7 +89,7 @@ namespace Scenes.Game.Scripts.Entities.Player.Logic
                 NetMaxHealth.Value = 100;
                 NetHealth.Value = NetMaxHealth.Value;
             }
-            
+
             if(IsOwner)
             {
                 IsLocal = true;

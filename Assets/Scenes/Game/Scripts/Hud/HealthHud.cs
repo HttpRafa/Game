@@ -1,6 +1,7 @@
-﻿using System.Collections;
-using Scenes.Game.Scripts.Entities.Player.Logic;
+﻿using Scenes.Game.Scripts.Entities.Player.Logic;
 using TMPro;
+using Unity.Netcode;
+using Unity.Netcode.Transports.UTP;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -15,16 +16,34 @@ namespace Scenes.Game.Scripts.Hud
 
         [Header("Damage Effect")] 
         [SerializeField] private Image damageEffect;
-        //[SerializeField] private float damageEffectTime = 0.1f;
+        [SerializeField] private float damageEffectMaxAlpha = 0.35f;
+        [SerializeField] private float damageEffectSpeed = 0.025f;
 
         private float _maxHealth;
+        
+        private float _damageEffectTargetAlpha = 0f;
 
         public void Setup(PlayerController playerController)
         {
             _maxHealth = playerController.NetMaxHealth.Value;
             
             playerController.NetHealth.OnValueChanged += OnHealthChanged;
+
             playerController.NetMaxHealth.OnValueChanged += OnMaxHealthChanged;
+        }
+
+        private void Update()
+        {
+            var imageColor = damageEffect.color;
+            imageColor.a = Mathf.Lerp(imageColor.a, _damageEffectTargetAlpha, damageEffectSpeed);
+            damageEffect.color = imageColor;
+
+            if (imageColor.a >= _damageEffectTargetAlpha - 0.05f)
+            {
+                _damageEffectTargetAlpha = 0f;
+            }
+            
+            
         }
 
         private void OnMaxHealthChanged(float previousValue, float newValue)
@@ -34,9 +53,9 @@ namespace Scenes.Game.Scripts.Hud
 
         private void OnHealthChanged(float previousValue, float newValue)
         {
-            if ((previousValue > newValue) && newValue > 0)
+            if ((previousValue > newValue))
             {
-                // TODO: Play damage animation
+                _damageEffectTargetAlpha = damageEffectMaxAlpha;
             }
             
             float progress = newValue / _maxHealth;

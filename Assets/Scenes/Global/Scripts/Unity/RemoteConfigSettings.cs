@@ -60,6 +60,9 @@ namespace Scenes.Game.Scripts.Unity
         private void Awake()
         {
             Instance = this;
+            
+            DontDestroyOnLoad(gameObject);
+            DontDestroyOnLoad(this);
         }
     }
 }

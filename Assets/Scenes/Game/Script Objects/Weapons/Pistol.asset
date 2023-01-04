@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   name: Pistol
   damage: 2
-  bulletSpeed: 35
-  fireRate: 1500
+  bulletSpeed: 40
+  fireRate: 150
   magSize: 6
   reloadTime: 1.5
