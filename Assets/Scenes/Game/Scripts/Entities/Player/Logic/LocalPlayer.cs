@@ -17,7 +17,7 @@ namespace Scenes.Game.Scripts.Entities.Player.Logic
         [SerializeField] private CinemachineVirtualCamera virtualCamera;
         
         [Header("Hud")]
-        [SerializeField] private HealthBar healthBar;
+        [SerializeField] private HealthHud healthHud;
 
         private void Awake()
         {
@@ -46,7 +46,7 @@ namespace Scenes.Game.Scripts.Entities.Player.Logic
 
         public void SetupHud(PlayerController playerController)
         {
-            healthBar.Setup(playerController);
+            healthHud.Setup(playerController);
         }
         
     }
