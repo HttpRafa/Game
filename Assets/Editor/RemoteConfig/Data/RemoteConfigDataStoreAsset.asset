@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 469c24fdb3bd6431b92cc1465bd9166b, type: 3}
+  m_Name: RemoteConfigDataStoreAsset
+  m_EditorClassIdentifier: 
+  _rsKeyList: "[\r\n  {\r\n    \"metadata\": {\r\n      \"entityId\": \"36ebab6e-2138-4e40-9105-32a3d8b0e047\"\r\n   
+    },\r\n    \"rs\": {\r\n      \"key\": \"season\",\r\n      \"type\": \"int\",\r\n     
+    \"value\": 0\r\n    }\r\n  }\r\n]"
+  _rsLastCachedKeyList: "[\r\n  {\r\n    \"metadata\": {\r\n      \"entityId\": \"36ebab6e-2138-4e40-9105-32a3d8b0e047\"\r\n   
+    },\r\n    \"rs\": {\r\n      \"key\": \"season\",\r\n      \"type\": \"int\",\r\n     
+    \"value\": 0\r\n    }\r\n  }\r\n]"
+  _environments: "[\r\n  {\r\n    \"projectId\": \"c54c36c2-457a-4eb9-ab1f-bda6221360a9\",\r\n   
+    \"name\": \"production\",\r\n    \"id\": \"130bbd2f-8102-469e-bf79-69729fab0b3e\",\r\n   
+    \"isDefault\": true,\r\n    \"createdAt\": \"2023-01-04T02:32:17Z\",\r\n    \"updatedAt\":
+    \"2023-01-04T02:32:17Z\"\r\n  },\r\n  {\r\n    \"projectId\": \"c54c36c2-457a-4eb9-ab1f-bda6221360a9\",\r\n   
+    \"name\": \"development\",\r\n    \"id\": \"62b46fcf-843a-4be8-9123-d82231307657\",\r\n   
+    \"isDefault\": false,\r\n    \"createdAt\": \"2023-01-04T02:54:17Z\",\r\n   
+    \"updatedAt\": \"2023-01-04T02:54:17Z\"\r\n  }\r\n]"

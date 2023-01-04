@@ -33,8 +33,6 @@ namespace Scenes.Game.Scripts.Entities.Bullet
 
         private void OnCollisionEnter(Collision collision)
         {
-            GameLogger.Info(collision.collider.gameObject.name);
-            
             if(collision.collider.GetComponent<Bullet>() != null) return;
             PlayerController hitController = collision.collider.GetComponent<PlayerController>();
             if (hitController != null && hitController.NetworkObjectId == _ownerId) return;
