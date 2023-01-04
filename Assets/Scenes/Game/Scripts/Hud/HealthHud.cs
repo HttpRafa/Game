@@ -15,7 +15,7 @@ namespace Scenes.Game.Scripts.Hud
 
         [Header("Damage Effect")] 
         [SerializeField] private Image damageEffect;
-        [SerializeField] private float damageEffectTime = 0.1f;
+        //[SerializeField] private float damageEffectTime = 0.1f;
 
         private float _maxHealth;
 

@@ -50,6 +50,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   hitPrefab: {fileID: 1337198075554910, guid: 4de342ffa110d894386c2f11d9692198, type: 3}
+  bulletRigidbody: {fileID: 1006801488416320585}
+  trailRenderer: {fileID: 1006801488416320586}
   destroyTime: 5
 --- !u!54 &1006801488416320585
 Rigidbody:

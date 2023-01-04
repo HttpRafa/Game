@@ -15,6 +15,6 @@ MonoBehaviour:
   name: Pistol
   damage: 2
   bulletSpeed: 35
-  fireRate: 150
+  fireRate: 1500
   magSize: 6
   reloadTime: 1.5

@@ -1,17 +1,22 @@
 ﻿using System.Collections;
+using Redcode.Pools;
 using Scenes.Game.Scripts.Entities.Player.Logic;
 using Scenes.Game.Scripts.Enums;
-using Scenes.Global.Scripts.Logging;
 using UnityEngine;
 
 namespace Scenes.Game.Scripts.Entities.Bullet
 {
     
     [RequireComponent(typeof(Rigidbody))]
-    public class Bullet : MonoBehaviour
+    public class Bullet : MonoBehaviour, IPoolObject
     {
 
+        [Header("Info")]
         [SerializeField] private GameObject hitPrefab;
+        
+        [Header("Reset Info")]
+        [SerializeField] private Rigidbody bulletRigidbody;
+        [SerializeField] private TrailRenderer trailRenderer;
         
         [SerializeField] private int destroyTime = 5;
 
@@ -26,8 +31,11 @@ namespace Scenes.Game.Scripts.Entities.Bullet
             _ownerId = ownerId;
 
             // Apply force
-            GetComponent<Rigidbody>().AddForce(direction * bulletSpeed, ForceMode.Impulse);
+            bulletRigidbody.AddForce(direction * bulletSpeed, ForceMode.Impulse);
 
+            // Clear TrailRender
+            trailRenderer.Clear();
+            
             StartCoroutine(DestroyAfterTime(destroyTime));
         }
 
@@ -59,10 +67,15 @@ namespace Scenes.Game.Scripts.Entities.Bullet
 
         private void BulletHit(Vector3 position, Vector3 forward)
         {
-            GameObject hitObject = Instantiate(hitPrefab, position, Quaternion.identity);
-            if(forward != Vector3.zero) hitObject.transform.forward = forward;
-            
-            Destroy(gameObject);
+            var hitObject = PoolManager.Instance.GetFromPool<BulletHit>();
+            if (hitObject != null)
+            {
+                hitObject.transform.position = position;
+                if(forward != Vector3.zero) hitObject.transform.forward = forward;
+                hitObject.Play();   
+            }
+
+            PoolManager.Instance.TakeToPool<Bullet>(this);
         }
 
         IEnumerator DestroyAfterTime(float time)
@@ -70,6 +83,16 @@ namespace Scenes.Game.Scripts.Entities.Bullet
             yield return new WaitForSeconds(time);
             
             BulletHit(transform.position, Vector3.zero);
+        }
+
+        public void OnCreatedInPool()
+        {
+            
+        }
+
+        public void OnGettingFromPool()
+        {
+            bulletRigidbody.velocity = Vector3.zero;
         }
         
     }

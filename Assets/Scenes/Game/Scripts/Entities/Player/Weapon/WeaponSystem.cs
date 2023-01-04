@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Redcode.Pools;
 using Scenes.Game.Scripts.Entities.Player.Logic;
 using Unity.Netcode;
 using UnityEngine;
@@ -11,7 +12,6 @@ namespace Scenes.Game.Scripts.Entities.Player.Weapon
         private readonly NetworkVariable<int> _netSelectedWeapon = new(writePerm: NetworkVariableWritePermission.Server);
 
         [Header("Data")]
-        [SerializeField] private Bullet.Bullet bulletPrefab;
         [SerializeField] private PlayerController playerController;
 
         [Header("Weapons")]
@@ -91,8 +91,12 @@ namespace Scenes.Game.Scripts.Entities.Player.Weapon
 
         private void SpawnBullet(bool owner, ulong ownerId, Vector3 startPosition, Vector3 direction, float bulletSpeed, float damage)
         {
-            Bullet.Bullet bullet = Instantiate(bulletPrefab, startPosition, Quaternion.identity);
-            bullet.Setup(owner, ownerId, direction, bulletSpeed, damage);
+            var bullet = PoolManager.Instance.GetFromPool<Bullet.Bullet>();
+            if (bullet != null)
+            {
+                bullet.transform.position = startPosition;
+                bullet.Setup(owner, ownerId, direction, bulletSpeed, damage);
+            }
         }
 
         public void ChangeWeapon(int index)
