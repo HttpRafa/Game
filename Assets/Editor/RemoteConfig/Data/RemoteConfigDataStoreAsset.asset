@@ -12,12 +12,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 469c24fdb3bd6431b92cc1465bd9166b, type: 3}
   m_Name: RemoteConfigDataStoreAsset
   m_EditorClassIdentifier: 
-  _rsKeyList: '[]'
-  _rsLastCachedKeyList: '[]'
+  _rsKeyList: "[\r\n  {\r\n    \"metadata\": {\r\n      \"entityId\": \"f2c6d1b6-18dd-4bb9-b7ee-e82b82b4e0cc\"\r\n   
+    },\r\n    \"rs\": {\r\n      \"key\": \"season\",\r\n      \"type\": \"int\",\r\n     
+    \"value\": 0\r\n    }\r\n  }\r\n]"
+  _rsLastCachedKeyList: "[\r\n  {\r\n    \"metadata\": {\r\n      \"entityId\": \"f2c6d1b6-18dd-4bb9-b7ee-e82b82b4e0cc\"\r\n   
+    },\r\n    \"rs\": {\r\n      \"key\": \"season\",\r\n      \"type\": \"int\",\r\n     
+    \"value\": 0\r\n    }\r\n  }\r\n]"
   _environments: "[\r\n  {\r\n    \"projectId\": \"c54c36c2-457a-4eb9-ab1f-bda6221360a9\",\r\n   
-    \"name\": \"production\",\r\n    \"id\": \"130bbd2f-8102-469e-bf79-69729fab0b3e\",\r\n   
-    \"isDefault\": true,\r\n    \"createdAt\": \"2023-01-04T02:32:17Z\",\r\n    \"updatedAt\":
-    \"2023-01-04T02:32:17Z\"\r\n  },\r\n  {\r\n    \"projectId\": \"c54c36c2-457a-4eb9-ab1f-bda6221360a9\",\r\n   
     \"name\": \"development\",\r\n    \"id\": \"62b46fcf-843a-4be8-9123-d82231307657\",\r\n   
     \"isDefault\": false,\r\n    \"createdAt\": \"2023-01-04T02:54:17Z\",\r\n   
-    \"updatedAt\": \"2023-01-04T02:54:17Z\"\r\n  }\r\n]"
+    \"updatedAt\": \"2023-01-04T02:54:17Z\"\r\n  },\r\n  {\r\n    \"projectId\":
+    \"c54c36c2-457a-4eb9-ab1f-bda6221360a9\",\r\n    \"name\": \"production\",\r\n   
+    \"id\": \"130bbd2f-8102-469e-bf79-69729fab0b3e\",\r\n    \"isDefault\": true,\r\n   
+    \"createdAt\": \"2023-01-04T02:32:17Z\",\r\n    \"updatedAt\": \"2023-01-04T02:32:17Z\"\r\n 
+    }\r\n]"
