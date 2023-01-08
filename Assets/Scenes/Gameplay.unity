@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.18028378, g: 0.22571412, b: 0.30692285, a: 1}
+  m_IndirectSpecularColor: {r: 0.12731749, g: 0.13414757, b: 0.1210787, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -1464,6 +1464,18 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 879498201}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &879498203 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3321048680867261351, guid: 4de342ffa110d894386c2f11d9692198,
+    type: 3}
+  m_PrefabInstance: {fileID: 879498201}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d068b2db421f45d7bbc7f6e7db0fdd15, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1007642311
 GameObject:
   m_ObjectHideFlags: 0
@@ -1880,18 +1892,6 @@ MonoBehaviour:
   statsDisplays:
   - textObject: {fileID: 771427423}
     displayInfo: 0
---- !u!114 &1322675009 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 3321048680867261351, guid: 4de342ffa110d894386c2f11d9692198,
-    type: 3}
-  m_PrefabInstance: {fileID: 879498201}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d068b2db421f45d7bbc7f6e7db0fdd15, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1461982921
 GameObject:
   m_ObjectHideFlags: 0
@@ -2499,7 +2499,7 @@ MonoBehaviour:
     _container: {fileID: 1093375448}
     _nonLazy: 0
   - _name: Bullet Hit Effects
-    _component: {fileID: 1322675009}
+    _component: {fileID: 879498203}
     _count: 50
     _container: {fileID: 1833887342}
     _nonLazy: 0

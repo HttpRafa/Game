@@ -1,5 +1,5 @@
 ﻿using System.Collections;
-using Redcode.Pools;
+using Modules.Submodules.Pools.Scripts;
 using Scenes.Gameplay.Scripts.Entities.Player.Logic;
 using Scenes.Gameplay.Scripts.Enums;
 using UnityEngine;
@@ -11,9 +11,6 @@ namespace Scenes.Gameplay.Scripts.Entities.Bullet
     public class Bullet : MonoBehaviour, IPoolObject
     {
 
-        [Header("Info")]
-        [SerializeField] private GameObject hitPrefab;
-        
         [Header("Reset Info")]
         [SerializeField] private Rigidbody bulletRigidbody;
         [SerializeField] private TrailRenderer trailRenderer;

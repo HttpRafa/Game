@@ -1,6 +1,4 @@
-using UnityEngine;
-
-namespace Redcode.Pools
+namespace Modules.Submodules.Pools.Scripts
 {
     /// <summary>
     /// Interface for pool's objects. <br/>

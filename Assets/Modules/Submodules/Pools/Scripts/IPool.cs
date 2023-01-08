@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Redcode.Pools
+namespace Modules.Submodules.Pools.Scripts
 {
     /// <summary>
     /// Represent nongeneralized objects pool.
