@@ -1,0 +1,11 @@
+[gd_scene load_steps=3 format=3 uid="uid://c0ojari6u0vwq"]
+
+[ext_resource type="PackedScene" uid="uid://haxlve3xg6lc" path="res://scenes/maps/TestWorld.tscn" id="1_fpiia"]
+[ext_resource type="PackedScene" uid="uid://ddmws132s03tw" path="res://scenes/player/LocalPlayer.tscn" id="1_q0384"]
+
+[node name="World" type="Node3D"]
+
+[node name="TestWorld" parent="." instance=ExtResource("1_fpiia")]
+
+[node name="LocalPlayer" parent="." instance=ExtResource("1_q0384")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 5.825)
