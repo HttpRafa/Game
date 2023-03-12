@@ -11,18 +11,18 @@ public partial class PlayerMovement : CharacterBody3D
 
 	[Export] private AimCrossHair _aimCrossHair;
 
+	private bool _isUsingMouse = true;
+	
 	public override void _PhysicsProcess(double delta)
 	{
 		Vector3 velocity = Velocity;
 
-		if (Input.IsActionPressed("look_up"))
+		if (_isUsingMouse && (Input.IsActionPressed("look_up") || Input.IsActionPressed("look_down") || Input.IsActionPressed("look_right") || Input.IsActionPressed("look_left")))
 		{
-			GD.Print("Controller detected");
-		}
-
-		if (Input.GetLastMouseVelocity() > Vector2.Zero)
+			_isUsingMouse = false;
+		} else if (!_isUsingMouse && (Input.GetLastMouseVelocity() > Vector2.Zero))
 		{
-			GD.Print("Mouse detected");
+			_isUsingMouse = true;
 		}
 		
 		// Add the gravity
