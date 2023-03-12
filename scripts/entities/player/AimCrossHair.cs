@@ -1,5 +1,4 @@
 using Godot;
-using Godot.Collections;
 
 namespace Game.scripts.entities.player;
 
@@ -7,7 +6,7 @@ public partial class AimCrossHair : MeshInstance3D
 {
 
 	[Export] private Camera3D _camera3D;
-	
+
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{

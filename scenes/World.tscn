@@ -1,15 +1,16 @@
-[gd_scene load_steps=6 format=3 uid="uid://c0ojari6u0vwq"]
+[gd_scene load_steps=7 format=3 uid="uid://bkbmc4fldg8xb"]
 
 [ext_resource type="PackedScene" uid="uid://haxlve3xg6lc" path="res://scenes/maps/TestWorld.tscn" id="1_fpiia"]
 [ext_resource type="Script" path="res://scripts/entities/player/LocalPlayer.cs" id="2_ioncx"]
 [ext_resource type="PackedScene" uid="uid://m1j8m6acidmd" path="res://scenes/player/Player.tscn" id="2_q7brq"]
 [ext_resource type="Script" path="res://scripts/entities/player/AimCrossHair.cs" id="3_gk6jt"]
 [ext_resource type="Script" path="res://scripts/entities/player/PlayerMovement.cs" id="3_rf4s3"]
+[ext_resource type="Script" path="res://scripts/entities/camera/FollowCamera.cs" id="6_7r02q"]
 
 [node name="World" type="Node3D"]
 
 [node name="Sun" type="DirectionalLight3D" parent="."]
-transform = Transform3D(0.866025, 0.409576, 0.286788, 0, -0.573576, 0.819152, 0.5, -0.709406, -0.496732, 0, 3, 0)
+transform = Transform3D(0.707106, -0.541675, 0.454519, 0, 0.642787, 0.766044, -0.707106, -0.541675, 0.454519, 0, 3, 0)
 shadow_enabled = true
 
 [node name="TestWorld" parent="." instance=ExtResource("1_fpiia")]
@@ -19,12 +20,16 @@ script = ExtResource("2_ioncx")
 
 [node name="AimCrossHair" type="MeshInstance3D" parent="LocalPlayer" node_paths=PackedStringArray("_camera3D")]
 script = ExtResource("3_gk6jt")
-_camera3D = NodePath("../Camera3D")
+_camera3D = NodePath("../MainCamera")
 
 [node name="Player" parent="LocalPlayer" instance=ExtResource("2_q7brq")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.40426, 5.72198)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.5, 5, 0)
 script = ExtResource("3_rf4s3")
 _speed = 6.0
 
-[node name="Camera3D" type="Camera3D" parent="LocalPlayer"]
+[node name="MainCamera" type="Camera3D" parent="LocalPlayer" node_paths=PackedStringArray("_target")]
 transform = Transform3D(0.707107, -0.5, 0.5, 0, 0.707107, 0.707107, -0.707107, -0.5, 0.5, 10, 10, 10)
+fov = 60.0
+script = ExtResource("6_7r02q")
+_target = NodePath("../Player")
+_offset = Vector3(0, 17.5, 12.5)
