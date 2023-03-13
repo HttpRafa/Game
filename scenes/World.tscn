@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3 uid="uid://bkbmc4fldg8xb"]
+[gd_scene load_steps=12 format=3 uid="uid://bkbmc4fldg8xb"]
 
 [ext_resource type="PackedScene" uid="uid://haxlve3xg6lc" path="res://scenes/maps/TestWorld.tscn" id="1_fpiia"]
 [ext_resource type="Script" path="res://scripts/entities/player/LocalPlayer.cs" id="2_ioncx"]
@@ -8,6 +8,8 @@
 [ext_resource type="Script" path="res://scripts/entities/player/Crosshair.cs" id="3_vxgg6"]
 [ext_resource type="Script" path="res://scripts/entities/camera/FollowCamera.cs" id="6_7r02q"]
 [ext_resource type="ArrayMesh" uid="uid://df1220uiccfbw" path="res://models/entities/player/rotationIndicator.res" id="7_3p5ae"]
+[ext_resource type="Script" path="res://scripts/weapon/WeaponHolder.cs" id="8_a0u5p"]
+[ext_resource type="PackedScene" uid="uid://dwqmexymj6yry" path="res://scenes/weapons/Pistol.tscn" id="8_tvc8x"]
 [ext_resource type="Script" path="res://scripts/entities/camera/OverlayCamera.cs" id="8_ws288"]
 
 [node name="World" type="Node3D"]
@@ -33,13 +35,21 @@ mesh = ExtResource("3_mjswg")
 
 [node name="Player" parent="LocalPlayer" node_paths=PackedStringArray("_crosshair") instance=ExtResource("2_q7brq")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.5, 5, 0)
-rotation_edit_mode = 1
 script = ExtResource("3_rf4s3")
 _crosshair = NodePath("../Crosshair")
 
 [node name="RotationIndicator" type="MeshInstance3D" parent="LocalPlayer/Player"]
 transform = Transform3D(-4.37114e-08, 1, -4.37114e-08, 0, -4.37114e-08, -1, -1, -4.37114e-08, 1.91069e-15, 0, -0.75, 0)
 mesh = ExtResource("7_3p5ae")
+
+[node name="WeaponHolder" type="Node3D" parent="LocalPlayer/Player" node_paths=PackedStringArray("_crosshair", "_playerMovement")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.621071, 0.00897884, -0.0140889)
+script = ExtResource("8_a0u5p")
+_crosshair = NodePath("../../Crosshair")
+_playerMovement = NodePath("..")
+
+[node name="Pistol" parent="LocalPlayer/Player/WeaponHolder" instance=ExtResource("8_tvc8x")]
+transform = Transform3D(0.75, 0, 0, 0, 0.75, 0, 0, 0, 0.75, 0, 0, 0)
 
 [node name="MainCamera" type="Camera3D" parent="LocalPlayer" node_paths=PackedStringArray("_target")]
 transform = Transform3D(0.707107, -0.5, 0.5, 0, 0.707107, 0.707107, -0.707107, -0.5, 0.5, 10, 10, 10)
@@ -64,6 +74,7 @@ stretch = true
 [node name="SubViewport" type="SubViewport" parent="LocalPlayer/MainCamera/CanvasLayer/SubViewportContainer"]
 transparent_bg = true
 handle_input_locally = false
+size = Vector2i(1152, 648)
 size_2d_override_stretch = true
 render_target_update_mode = 4
 

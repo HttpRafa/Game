@@ -1,0 +1,25 @@
+[gd_scene load_steps=5 format=3 uid="uid://dwqmexymj6yry"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_cp2pk"]
+albedo_color = Color(0.545098, 0.270588, 0.0745098, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_sdjtb"]
+material = SubResource("StandardMaterial3D_cp2pk")
+size = Vector3(0.25, 0.25, 0.25)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_8m0g0"]
+albedo_color = Color(0.239216, 0.239216, 0.239216, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_ju4pr"]
+material = SubResource("StandardMaterial3D_8m0g0")
+size = Vector3(0.25, 0.25, 0.75)
+
+[node name="Pistol" type="Node3D"]
+
+[node name="Grip" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.25, 0)
+mesh = SubResource("BoxMesh_sdjtb")
+
+[node name="Barrel" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.25)
+mesh = SubResource("BoxMesh_ju4pr")

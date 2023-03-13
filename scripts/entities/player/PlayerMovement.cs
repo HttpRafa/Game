@@ -5,15 +5,18 @@ namespace Game.scripts.entities.player;
 public partial class PlayerMovement : CharacterBody3D
 {
 
+	[Signal]
+	public delegate void MouseInputStateChangedEventHandler(bool enabled);
+	
 	[Export] private float _gravity = ProjectSettings.GetSetting("physics/3d/default_gravity").AsSingle();
 	[Export] private float _speed = 6.0f;
 	[Export] private float _jumpVelocity = 4.5f;
-	[Export] private float _rotationSpeed = 8f;
+	[Export] private float _rotationSpeed = 15f;
 
 	[Export] private Crosshair _crosshair;
 	
 	private bool _isUsingMouse = true;
-
+	
 	private Vector3 _rotationTarget;
 
 	public override void _Ready()
@@ -30,10 +33,14 @@ public partial class PlayerMovement : CharacterBody3D
 		{
 			_isUsingMouse = false;
 			_crosshair.Hide();
+			
+			EmitSignal(SignalName.MouseInputStateChanged, false);
 		} else if (!_isUsingMouse && (Input.GetLastMouseVelocity() > Vector2.Zero))
 		{
 			_isUsingMouse = true;
 			_crosshair.Show();
+
+			EmitSignal(SignalName.MouseInputStateChanged, true);
 		}
 		
 		MovePlayer(delta);
@@ -52,9 +59,12 @@ public partial class PlayerMovement : CharacterBody3D
 		else
 		{
 			Vector2 gamepadInput = Input.GetVector("look_left", "look_right", "look_up", "look_down");
-			Vector3 gamepadLook = new Vector3(gamepadInput.X, 0, gamepadInput.Y) + Position;
-			Quaternion rotation = Transform.LookingAt(gamepadLook, Vector3.Up).Basis.GetRotationQuaternion();
-			Rotation = Quaternion.FromEuler(Rotation).Slerp(rotation, _rotationSpeed * (float)delta).GetEuler();
+			if (gamepadInput != Vector2.Zero)
+			{
+				Vector3 gamepadLook = new Vector3(gamepadInput.X, 0, gamepadInput.Y) + Position;
+				Quaternion rotation = Transform.LookingAt(gamepadLook, Vector3.Up).Basis.GetRotationQuaternion();
+				Rotation = Quaternion.FromEuler(Rotation).Slerp(rotation, _rotationSpeed * (float)delta).GetEuler();	
+			}
 		}
 	}
 
