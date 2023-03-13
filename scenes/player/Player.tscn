@@ -20,6 +20,6 @@ shape = SubResource("CapsuleShape3D_vvqvg")
 mesh = SubResource("CapsuleMesh_two3t")
 
 [node name="Face" type="MeshInstance3D" parent="Model"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.47, 0.4)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.47, -0.4)
 mesh = SubResource("BoxMesh_uih1q")
 skeleton = NodePath("../..")
