@@ -6,8 +6,9 @@
 [ext_resource type="Script" path="res://scripts/entities/camera/FollowCamera.cs" id="8_xf7n1"]
 [ext_resource type="Script" path="res://scripts/entities/camera/OverlayCamera.cs" id="9_56sob"]
 
-[node name="LocalPlayer" type="Node3D"]
+[node name="LocalPlayer" type="Node3D" node_paths=PackedStringArray("Crosshair")]
 script = ExtResource("1_wxnmq")
+Crosshair = NodePath("Crosshair")
 
 [node name="Crosshair" type="Node3D" parent="." node_paths=PackedStringArray("_camera3D")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.00279, 0)
@@ -25,6 +26,7 @@ cull_mask = 1048559
 current = true
 fov = 60.0
 script = ExtResource("8_xf7n1")
+_useRemote = true
 _target = NodePath("")
 _offset = Vector3(0, 17.5, 12.5)
 

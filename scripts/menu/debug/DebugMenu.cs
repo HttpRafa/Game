@@ -6,8 +6,9 @@ namespace Game.scripts.menu.debug;
 public partial class DebugMenu : PanelContainer
 {
 
-	[Export] private World _world;
+	[Export] private GameWorld _world;
 	
+	[Export] private Label _statusLabel;
 	[Export] private Button _hostButton;
 	[Export] private Button _joinButton;
 
@@ -21,7 +22,8 @@ public partial class DebugMenu : PanelContainer
 			if (data.Length > 1)
 			{
 				int port = Convert.ToInt32(data[1]);
-				_world.StartHost(port);	
+				_world.StartHost(port);
+				_statusLabel.Text = "Host";
 				Hide();
 			}
 		};
@@ -31,7 +33,8 @@ public partial class DebugMenu : PanelContainer
 			if (data.Length > 1)
 			{
 				int port = Convert.ToInt32(data[1]);
-				_world.StartClient(data[0], port);		
+				_world.StartClient(data[0], port);	
+				_statusLabel.Text = "Client";
 				Hide();
 			}
 		};

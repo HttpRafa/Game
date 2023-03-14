@@ -1,29 +1,34 @@
 [gd_scene load_steps=6 format=3 uid="uid://bkbmc4fldg8xb"]
 
+[ext_resource type="Script" path="res://scripts/GameWorld.cs" id="1_ep3wq"]
 [ext_resource type="PackedScene" uid="uid://haxlve3xg6lc" path="res://scenes/maps/TestWorld.tscn" id="1_fpiia"]
-[ext_resource type="Script" path="res://scripts/World.cs" id="1_nxaw1"]
+[ext_resource type="PackedScene" uid="uid://m1j8m6acidmd" path="res://scenes/player/Player.tscn" id="2_dhntw"]
 [ext_resource type="PackedScene" uid="uid://c575y6u2ipvub" path="res://scenes/player/LocalPlayer.tscn" id="2_na6q5"]
-[ext_resource type="PackedScene" uid="uid://m1j8m6acidmd" path="res://scenes/player/Player.tscn" id="2_q7brq"]
 [ext_resource type="Script" path="res://scripts/menu/debug/DebugMenu.cs" id="3_jsufh"]
 
 [node name="World" type="Node3D" node_paths=PackedStringArray("_networkNode")]
-script = ExtResource("1_nxaw1")
-_networkNode = NodePath("Network")
-_remotePlayerScene = ExtResource("2_q7brq")
-_localPlayerScene = ExtResource("2_na6q5")
+script = ExtResource("1_ep3wq")
+_networkNode = NodePath("Gameplay/Network")
+_remotePlayerScene = ExtResource("2_dhntw")
 
-[node name="Sun" type="DirectionalLight3D" parent="."]
-transform = Transform3D(0.707106, -0.541675, 0.454519, 0, 0.642787, 0.766044, -0.707106, -0.541675, 0.454519, 0, 3, 0)
+[node name="Enviroment" type="Node3D" parent="."]
+
+[node name="Sun" type="DirectionalLight3D" parent="Enviroment"]
+transform = Transform3D(0.707107, -0.541675, 0.454519, 0, 0.642787, 0.766045, -0.707107, -0.541675, 0.454519, 0, 3, 0)
 shadow_enabled = true
 
-[node name="TestWorld" parent="." instance=ExtResource("1_fpiia")]
+[node name="TestWorld" parent="Enviroment" instance=ExtResource("1_fpiia")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.87134, 0, 0)
 
-[node name="Network" type="Node3D" parent="."]
+[node name="Gameplay" type="Node3D" parent="."]
+
+[node name="LocalPlayer" parent="Gameplay" instance=ExtResource("2_na6q5")]
+
+[node name="Network" type="Node3D" parent="Gameplay"]
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 
-[node name="DebugMenu" type="PanelContainer" parent="CanvasLayer" node_paths=PackedStringArray("_world", "_hostButton", "_joinButton", "_addressEntry")]
+[node name="DebugMenu" type="PanelContainer" parent="CanvasLayer" node_paths=PackedStringArray("_world", "_statusLabel", "_hostButton", "_joinButton", "_addressEntry")]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -35,6 +40,7 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("3_jsufh")
 _world = NodePath("../..")
+_statusLabel = NodePath("../PanelContainer/MarginContainer/VBoxContainer/Status")
 _hostButton = NodePath("MarginContainer/VBoxContainer/HostButton")
 _joinButton = NodePath("MarginContainer/VBoxContainer/JoinButton")
 _addressEntry = NodePath("MarginContainer/VBoxContainer/AddressEntry")
@@ -69,3 +75,24 @@ layout_mode = 2
 text = "127.0.0.1:9988"
 placeholder_text = "Enter Address"
 alignment = 1
+
+[node name="PanelContainer" type="PanelContainer" parent="CanvasLayer"]
+clip_contents = true
+offset_right = 66.0
+offset_bottom = 26.0
+scale = Vector2(0.959999, 1)
+
+[node name="MarginContainer" type="MarginContainer" parent="CanvasLayer/PanelContainer"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/PanelContainer/MarginContainer"]
+layout_mode = 2
+
+[node name="Status" type="Label" parent="CanvasLayer/PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Loading.
+"
+
+[node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="."]
+_spawnable_scenes = PackedStringArray("res://scenes/player/Player.tscn")
+spawn_path = NodePath("../Gameplay/Network")
