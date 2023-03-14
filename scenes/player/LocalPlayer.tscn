@@ -1,0 +1,53 @@
+[gd_scene load_steps=6 format=3 uid="uid://c575y6u2ipvub"]
+
+[ext_resource type="Script" path="res://scripts/entities/player/Crosshair.cs" id="1_mkwhc"]
+[ext_resource type="Script" path="res://scripts/entities/player/LocalPlayer.cs" id="1_wxnmq"]
+[ext_resource type="ArrayMesh" uid="uid://d4f75kg66pxvn" path="res://models/entities/player/crosshair.res" id="2_8nl4w"]
+[ext_resource type="Script" path="res://scripts/entities/camera/FollowCamera.cs" id="8_xf7n1"]
+[ext_resource type="Script" path="res://scripts/entities/camera/OverlayCamera.cs" id="9_56sob"]
+
+[node name="LocalPlayer" type="Node3D"]
+script = ExtResource("1_wxnmq")
+
+[node name="Crosshair" type="Node3D" parent="." node_paths=PackedStringArray("_camera3D")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.00279, 0)
+script = ExtResource("1_mkwhc")
+_camera3D = NodePath("../MainCamera")
+
+[node name="Model" type="MeshInstance3D" parent="Crosshair"]
+transform = Transform3D(-2.18557e-08, -0.5, 0, 0.5, -2.18557e-08, 0, 0, 0, 0.5, 0, 0, 0)
+layers = 16
+mesh = ExtResource("2_8nl4w")
+
+[node name="MainCamera" type="Camera3D" parent="." node_paths=PackedStringArray("_target")]
+transform = Transform3D(0.707107, -0.5, 0.5, 0, 0.707107, 0.707107, -0.707107, -0.5, 0.5, 10, 10, 10)
+cull_mask = 1048559
+current = true
+fov = 60.0
+script = ExtResource("8_xf7n1")
+_target = NodePath("")
+_offset = Vector3(0, 17.5, 12.5)
+
+[node name="CanvasLayer" type="CanvasLayer" parent="MainCamera"]
+follow_viewport_enabled = true
+
+[node name="SubViewportContainer" type="SubViewportContainer" parent="MainCamera/CanvasLayer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+stretch = true
+
+[node name="SubViewport" type="SubViewport" parent="MainCamera/CanvasLayer/SubViewportContainer"]
+transparent_bg = true
+handle_input_locally = false
+size = Vector2i(1152, 648)
+size_2d_override_stretch = true
+render_target_update_mode = 4
+
+[node name="OverlayCamera" type="Camera3D" parent="MainCamera/CanvasLayer/SubViewportContainer/SubViewport" node_paths=PackedStringArray("_mainCamera")]
+cull_mask = 16
+fov = 60.0
+script = ExtResource("9_56sob")
+_mainCamera = NodePath("../../../..")

@@ -1,4 +1,6 @@
-[gd_scene load_steps=5 format=3 uid="uid://m1j8m6acidmd"]
+[gd_scene load_steps=7 format=3 uid="uid://m1j8m6acidmd"]
+
+[ext_resource type="Script" path="res://scripts/entities/player/RemotePlayer.cs" id="1_k3ebt"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_vvqvg"]
 
@@ -11,7 +13,16 @@ albedo_color = Color(0, 0, 0, 1)
 material = SubResource("StandardMaterial3D_hplfh")
 size = Vector3(0.65, 0.25, 0.3)
 
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_5ici1"]
+properties/0/path = NodePath(".:position")
+properties/0/spawn = true
+properties/0/sync = true
+properties/1/path = NodePath(".:rotation")
+properties/1/spawn = true
+properties/1/sync = true
+
 [node name="Player" type="CharacterBody3D"]
+script = ExtResource("1_k3ebt")
 
 [node name="Collider" type="CollisionShape3D" parent="."]
 shape = SubResource("CapsuleShape3D_vvqvg")
@@ -23,3 +34,6 @@ mesh = SubResource("CapsuleMesh_two3t")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.47, -0.4)
 mesh = SubResource("BoxMesh_uih1q")
 skeleton = NodePath("../..")
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
+replication_config = SubResource("SceneReplicationConfig_5ici1")
