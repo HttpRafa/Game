@@ -6,7 +6,7 @@ use bevy_inspector_egui::prelude::ReflectInspectorOptions;
 pub struct RemotePlayerPlugin;
 
 impl Plugin for RemotePlayerPlugin {
-    fn build(&self, app: &mut App) {
+    fn build(&self, _app: &mut App) {
 
     }
 }

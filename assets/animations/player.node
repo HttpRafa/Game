@@ -1,5 +1,0 @@
-Id(0):FPSNode(
-    name: "PlayerFPS",
-    fps: 5,
-    then: Id(1),
-)
