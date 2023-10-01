@@ -1,0 +1,24 @@
+Id(1):MatchNode<PlayerState>(
+    name: "Player_SwitchNode",
+    check: Custom("PlayerState"),
+    default: Id(2),
+    pairs: [
+        (Idle, Id(2)),
+        (Walking, Id(3)),
+    ],
+),
+Id(2):IndexNode(
+    name: "Player_Walking",
+    frames: [
+        "player_idle_0.png"
+    ],
+    isloop: true,
+    index: Index(0),
+),
+Id(3):IndexNode(
+    name: "Player_Walking",
+    frames: [
+    ],
+    isloop: true,
+    index: Index(0),
+),

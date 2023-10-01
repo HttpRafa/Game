@@ -1,6 +1,8 @@
 mod client;
 
-use bevy::prelude::{App, Resource};
+use bevy::prelude::*;
+use bevy_inspector_egui::InspectorOptions;
+use bevy_inspector_egui::prelude::ReflectInspectorOptions;
 use crate::client::ClientPlugin;
 
 fn main() {
@@ -12,7 +14,8 @@ fn main() {
         .run();
 }
 
-#[derive(Resource)]
+#[derive(Resource, InspectorOptions, Default, Reflect)]
+#[reflect(Resource, InspectorOptions)]
 pub struct GridData {
     size: f32
 }
