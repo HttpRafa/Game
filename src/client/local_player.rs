@@ -7,6 +7,8 @@ use bevy_inspector_egui::InspectorOptions;
 use bevy_inspector_egui::prelude::ReflectInspectorOptions;
 use crate::client::animation::{Animation, AnimationFrame, Animations, Animator};
 use crate::client::remote_player::Player;
+use crate::client::y_sorting::YSort;
+use crate::common::TILE_SIZE;
 
 pub struct LocalPlayerPlugin;
 
@@ -32,6 +34,7 @@ pub struct MainCamera;
 
 #[derive(Bundle)]
 struct LocalPlayerBundle {
+    y_sort: YSort,
     sprite_bundle: SpriteSheetBundle,
     local_player: LocalPlayer,
     player: Player,
@@ -70,11 +73,16 @@ fn spawn_player(mut commands: Commands, asset_server: Res<AssetServer>, mut text
 
     // Load idle texture atlas
     let idle_texture_atlas = texture_atlases.add(TextureAtlas::from_grid(asset_server.load("animations/player/idle.png"), Vec2::new(16.0, 16.0), 5, 1, None, None));
-    let walk_texture_atlas = texture_atlases.add(TextureAtlas::from_grid(asset_server.load("animations/player/walking.png"), Vec2::new(16.0, 16.0), 3, 1, None, None));
+    let walk_texture_atlas = texture_atlases.add(TextureAtlas::from_grid(asset_server.load("animations/player/walking.png"), Vec2::new(16.0, 16.0), 3, 2, None, None));
 
     // Spawn local player
     commands.spawn(LocalPlayerBundle {
+        y_sort: YSort::default(),
         sprite_bundle: SpriteSheetBundle {
+            sprite: TextureAtlasSprite {
+                custom_size: Some(Vec2::new(TILE_SIZE.x * 1.5, TILE_SIZE.y * 1.5)),
+                ..default()
+            },
             texture_atlas: idle_texture_atlas.clone(),
             ..default()
         },
@@ -102,7 +110,7 @@ fn spawn_player(mut commands: Commands, asset_server: Res<AssetServer>, mut text
                         }
                     ]
                 },
-                // Walk animation
+                // Walk right animation
                 Animation {
                     frames: vec![
                         AnimationFrame {
@@ -120,6 +128,29 @@ fn spawn_player(mut commands: Commands, asset_server: Res<AssetServer>, mut text
                         AnimationFrame {
                             atlas_handle: walk_texture_atlas.clone(),
                             atlas_index: 2,
+                            duration: Duration::from_secs_f32(0.25),
+                            ..default()
+                        }
+                    ]
+                },
+                // Walk left animation
+                Animation {
+                    frames: vec![
+                        AnimationFrame {
+                            atlas_handle: walk_texture_atlas.clone(),
+                            atlas_index: 3,
+                            duration: Duration::from_secs_f32(0.25),
+                            ..default()
+                        },
+                        AnimationFrame {
+                            atlas_handle: walk_texture_atlas.clone(),
+                            atlas_index: 4,
+                            duration: Duration::from_secs_f32(0.25),
+                            ..default()
+                        },
+                        AnimationFrame {
+                            atlas_handle: walk_texture_atlas.clone(),
+                            atlas_index: 5,
                             duration: Duration::from_secs_f32(0.25),
                             ..default()
                         }
@@ -151,11 +182,31 @@ fn player_movement(mut characters: Query<(&mut Transform, &mut Animator, &LocalP
     }
     transform.translation += movement.normalize_or_zero() * player.speed * time.delta_seconds();
 
-    if movement == Vec3::ZERO && animator.current_animation != 0 {
-        animator.current_animation = 0;
-        animator.current_frame = 0;
-    } else if movement != Vec3::ZERO && animator.current_animation != 1 {
-        animator.current_animation = 1;
-        animator.current_frame = 0;
+    if movement.x == 0.0 {
+        // Is standing still
+
+        // If not in Idle animation
+        if animator.current_animation != 0 {
+            animator.current_animation = 0;
+            animator.current_frame = 0;
+        }
+        return;
+    }
+    if movement.x > 0.0 {
+        // Moving to the right
+
+        // If not in walking right animation
+        if animator.current_animation != 1 {
+            animator.current_animation = 1;
+            animator.current_frame = 0;
+        }
+    } else {
+        // Moving to the left
+
+        // If not in walking left animation
+        if animator.current_animation != 2 {
+            animator.current_animation = 2;
+            animator.current_frame = 0;
+        }
     }
 }

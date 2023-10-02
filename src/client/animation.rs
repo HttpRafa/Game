@@ -17,8 +17,6 @@ impl Plugin for SpriteAnimationPlugin {
 pub struct AnimationFrame {
     pub atlas_handle: Handle<TextureAtlas>,
     pub atlas_index: usize,
-    pub flip_x: bool,
-    pub flip_y: bool,
     pub duration: Duration,
 }
 
@@ -27,8 +25,6 @@ impl Default for AnimationFrame {
         Self {
             atlas_handle: Default::default(),
             atlas_index: 0,
-            flip_x: false,
-            flip_y: false,
             duration: Default::default(),
         }
     }
@@ -72,8 +68,6 @@ pub fn animate_sprite(mut query: Query<(&Animations, &mut Animator, &mut Handle<
                 animator.timer.reset();
                 *atlas = frame.atlas_handle.clone();
                 sprite.index = frame.atlas_index;
-                sprite.flip_x = frame.flip_x;
-                sprite.flip_y = frame.flip_y;
             }
         }
     }
