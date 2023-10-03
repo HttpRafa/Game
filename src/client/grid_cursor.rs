@@ -5,6 +5,7 @@ use bevy::utils::default;
 use bevy_inspector_egui::InspectorOptions;
 use bevy_inspector_egui::prelude::ReflectInspectorOptions;
 use crate::client::local_player::MainCamera;
+use crate::client::y_sorting::YSort;
 use crate::common::TILE_SIZE;
 
 pub struct GridCursorPlugin;
@@ -25,12 +26,14 @@ fn spawn_cursor(mut commands: Commands) {
         SpriteBundle {
             sprite: Sprite {
                 custom_size: Some(Vec2::new(TILE_SIZE.x, TILE_SIZE.y)),
+                color: Color::rgba(1.0, 1.0, 1.0, 0.05),
                 ..default()
             },
             ..default()
         },
         GridCursor,
-        Name::new("Debug Grid Cursor")
+        Name::new("Debug Grid Cursor"),
+        YSort(-2.5)
     ));
 }
 

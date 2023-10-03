@@ -1,6 +1,6 @@
 use bevy::app::App;
 use bevy::core::Name;
-use bevy::prelude::{AlignItems, BuildChildren, Color, Commands, ImageBundle, NodeBundle, Plugin, Startup, Style, UiRect, Val};
+use bevy::prelude::{Assets, AssetServer, AtlasImageBundle, BuildChildren, ButtonBundle, Changed, Children, Color, Commands, Component, Interaction, JustifyContent, NodeBundle, Plugin, Query, Res, ResMut, Startup, Style, TextureAtlas, UiRect, UiTextureAtlasImage, Update, Val, Vec2, With};
 use bevy::ui::PositionType;
 use bevy::utils::default;
 
@@ -8,26 +8,76 @@ pub struct HotbarUIPlugin;
 
 impl Plugin for HotbarUIPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Startup, spawn_ui);
+        app.add_systems(Startup, spawn_ui)
+            .add_systems(Update, handle_hover_and_click);
     }
 }
 
-fn spawn_ui(mut commands: Commands) {
+#[derive(Component)]
+struct Slot;
+
+fn handle_hover_and_click(interaction: Query<(&Interaction, &Children), (Changed<Interaction>, With<Slot>)>, mut hotbar_texture: Query<&mut UiTextureAtlasImage>) {
+    for (interaction, children) in interaction.iter() {
+        let mut hotbar_texture = hotbar_texture.get_mut(children[0]).unwrap();
+        match *interaction {
+            Interaction::Hovered => {
+                hotbar_texture.index = 1;
+            },
+            Interaction::Pressed => {
+                hotbar_texture.index = 2;
+            },
+            Interaction::None => {
+                hotbar_texture.index = 0;
+            }
+        }
+    }
+}
+
+fn spawn_ui(mut commands: Commands, asset_server: Res<AssetServer>, mut texture_atlases: ResMut<Assets<TextureAtlas>>) {
+    let hotbar_texture_atlas = texture_atlases.add(TextureAtlas::from_grid(asset_server.load("ui/hotbar/hotbar.png"), Vec2::new(16.0, 16.0), 3, 1, None, None));
+
     commands.spawn((NodeBundle {
         style: Style {
             position_type: PositionType::Absolute,
+            justify_content: JustifyContent::Center,
             bottom: Val::Px(0.0),
             width: Val::Percent(100.0),
-            height: Val::Percent(7.5),
-            align_items: AlignItems::Center,
-            padding: UiRect::all(Val::Px(10.0)),
+            height: Val::Percent(8.0),
             ..default()
         },
-        background_color: Color::BLUE.into(),
         ..default()
     }, Name::new("UI Root"))).with_children(|commands| {
-        commands.spawn(ImageBundle {
+        commands.spawn((NodeBundle {
+            style: Style {
+                position_type: PositionType::Absolute,
+                height: Val::Percent(100.0),
+                width: Val::Percent(50.0),
+                justify_content: JustifyContent::Center,
+                ..default()
+            },
             ..default()
+        }, Name::new("Hotbar Items"))).with_children(|commands| {
+            for x in 0..10 {
+                commands.spawn((ButtonBundle {
+                    style: Style {
+                        height: Val::Percent(90.0),
+                        margin: UiRect::new(
+                            Val::Px(2.5),
+                            Val::Px(2.5),
+                            Val::Px(2.5),
+                            Val::Px(2.5)
+                        ),
+                        ..default()
+                    },
+                    background_color: Color::BLUE.into(),
+                    ..default()
+                }, Name::new(format!("Slot {}", x)), Slot)).with_children(|commands| {
+                    commands.spawn(AtlasImageBundle {
+                        texture_atlas: hotbar_texture_atlas.clone(),
+                        ..default()
+                    });
+                });
+            }
         });
     });
 }
