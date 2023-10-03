@@ -1,6 +1,5 @@
 use bevy::app::App;
 use bevy::DefaultPlugins;
-use bevy::diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin};
 use bevy::input::common_conditions::input_toggle_active;
 use bevy::prelude::*;
 use bevy::utils::default;
@@ -38,7 +37,7 @@ impl Plugin for ClientPlugin {
                 })
                 .build()
             )
-            .add_plugins((LogDiagnosticsPlugin::default(), FrameTimeDiagnosticsPlugin::default()))
+            //.add_plugins((LogDiagnosticsPlugin::default(), FrameTimeDiagnosticsPlugin::default()))
             .add_plugins(WorldInspectorPlugin::default().run_if(input_toggle_active(false, KeyCode::Escape)))
             .add_plugins((YSortPlugin, SpriteAnimationPlugin, WorldPlugin))
             .add_plugins((LocalPlayerPlugin, RemotePlayerPlugin, GridCursorPlugin, HotbarUIPlugin))

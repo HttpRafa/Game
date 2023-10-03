@@ -1,11 +1,13 @@
 use std::time::Duration;
+
 use bevy::app::App;
 use bevy::input::mouse::{MouseScrollUnit, MouseWheel};
 use bevy::prelude::*;
 use bevy::render::camera::ScalingMode;
 use bevy_inspector_egui::InspectorOptions;
 use bevy_inspector_egui::prelude::ReflectInspectorOptions;
-use crate::client::animation::{Animation, AnimationFrame, Animations, Animator};
+
+use crate::client::animation::{Animation, AnimationFrame, Animations, Animator, calc_animation_index};
 use crate::client::remote_player::Player;
 use crate::client::y_sorting::YSort;
 use crate::common::TILE_SIZE;
@@ -25,7 +27,8 @@ impl Plugin for LocalPlayerPlugin {
 #[reflect(Component, InspectorOptions)]
 pub struct LocalPlayer {
     #[inspector(min = 0.0)]
-    pub speed: f32
+    pub speed: f32,
+    pub direction: Vec2,
 }
 
 #[derive(Component, InspectorOptions, Default, Reflect)]
@@ -60,6 +63,8 @@ fn scroll_camera(mut projection: Query<&mut OrthographicProjection, (With<Camera
     projection.scale = (projection.scale + movement / 7.5).clamp(MIN_ZOOM, MAX_ZOOM);
 }
 
+const TEXTURE_COLUMN_AMOUNT: usize = 3;
+
 fn spawn_player(mut commands: Commands, asset_server: Res<AssetServer>, mut texture_atlases: ResMut<Assets<TextureAtlas>>) {
     // Create camera
     let mut camera = (
@@ -73,7 +78,7 @@ fn spawn_player(mut commands: Commands, asset_server: Res<AssetServer>, mut text
 
     // Load idle texture atlas
     let idle_texture_atlas = texture_atlases.add(TextureAtlas::from_grid(asset_server.load("animations/player/idle.png"), Vec2::new(16.0, 16.0), 5, 1, None, None));
-    let walk_texture_atlas = texture_atlases.add(TextureAtlas::from_grid(asset_server.load("animations/player/walking.png"), Vec2::new(16.0, 16.0), 3, 2, None, None));
+    let walk_texture_atlas = texture_atlases.add(TextureAtlas::from_grid(asset_server.load("animations/player/walking.png"), Vec2::new(16.0, 16.0), 3, 8, None, None));
 
     // Spawn local player
     commands.spawn(LocalPlayerBundle {
@@ -87,75 +92,31 @@ fn spawn_player(mut commands: Commands, asset_server: Res<AssetServer>, mut text
             ..default()
         },
         local_player: LocalPlayer {
-            speed: 33.3
+            speed: 40.0,
+            direction: Default::default(),
         },
         player: Default::default(),
         animator: Default::default(),
         animations: Animations {
             animations: vec![
                 // Idle animation
-                Animation {
-                    frames: vec![
-                        AnimationFrame {
-                            atlas_handle: idle_texture_atlas.clone(),
-                            atlas_index: 0,
-                            duration: Duration::from_secs_f32(0.55),
-                            ..default()
-                        },
-                        AnimationFrame {
-                            atlas_handle: idle_texture_atlas.clone(),
-                            atlas_index: 1,
-                            duration: Duration::from_secs_f32(0.55),
-                            ..default()
-                        }
-                    ]
-                },
+                gen_animation(&idle_texture_atlas, 0, 2, 0.55),
                 // Walk right animation
-                Animation {
-                    frames: vec![
-                        AnimationFrame {
-                            atlas_handle: walk_texture_atlas.clone(),
-                            atlas_index: 0,
-                            duration: Duration::from_secs_f32(0.25),
-                            ..default()
-                        },
-                        AnimationFrame {
-                            atlas_handle: walk_texture_atlas.clone(),
-                            atlas_index: 1,
-                            duration: Duration::from_secs_f32(0.25),
-                            ..default()
-                        },
-                        AnimationFrame {
-                            atlas_handle: walk_texture_atlas.clone(),
-                            atlas_index: 2,
-                            duration: Duration::from_secs_f32(0.25),
-                            ..default()
-                        }
-                    ]
-                },
+                gen_animation(&walk_texture_atlas, 0, 3, 0.25),
                 // Walk left animation
-                Animation {
-                    frames: vec![
-                        AnimationFrame {
-                            atlas_handle: walk_texture_atlas.clone(),
-                            atlas_index: 3,
-                            duration: Duration::from_secs_f32(0.25),
-                            ..default()
-                        },
-                        AnimationFrame {
-                            atlas_handle: walk_texture_atlas.clone(),
-                            atlas_index: 4,
-                            duration: Duration::from_secs_f32(0.25),
-                            ..default()
-                        },
-                        AnimationFrame {
-                            atlas_handle: walk_texture_atlas.clone(),
-                            atlas_index: 5,
-                            duration: Duration::from_secs_f32(0.25),
-                            ..default()
-                        }
-                    ]
-                }
+                gen_animation(&walk_texture_atlas, 1, 3, 0.25),
+                // Walk up animation
+                gen_animation(&walk_texture_atlas, 2, 3, 0.25),
+                // Walk down animation
+                gen_animation(&walk_texture_atlas, 3, 3, 0.25),
+                // Walk up right animation
+                gen_animation(&walk_texture_atlas, 4, 3, 0.25),
+                // Walk up left animation
+                gen_animation(&walk_texture_atlas, 5, 3, 0.25),
+                // Walk down right animation
+                gen_animation(&walk_texture_atlas, 6, 3, 0.25),
+                // Walk down left animation
+                gen_animation(&walk_texture_atlas, 7, 3, 0.25),
             ]
         },
         name: Name::new("LocalPlayer"),
@@ -164,49 +125,114 @@ fn spawn_player(mut commands: Commands, asset_server: Res<AssetServer>, mut text
     });
 }
 
-fn player_movement(mut characters: Query<(&mut Transform, &mut Animator, &LocalPlayer)>, input: Res<Input<KeyCode>>, time: Res<Time>) {
-    let (mut transform, mut animator, player) = characters.single_mut();
+fn gen_animation(texture: &Handle<TextureAtlas>, row: usize, colum_amount: usize, duration: f32) -> Animation {
+    let mut frames: Vec<AnimationFrame> = vec![];
+
+    for colum in 0..colum_amount {
+        frames.push(AnimationFrame {
+            atlas_handle: texture.clone(),
+            atlas_index: calc_animation_index(row, colum, TEXTURE_COLUMN_AMOUNT),
+            duration: Duration::from_secs_f32(duration),
+            ..default()
+        });
+    }
+
+    Animation {
+        frames
+    }
+}
+
+fn player_movement(mut characters: Query<(&mut Transform, &mut Animator, &mut LocalPlayer)>, keyboard_input: Res<Input<KeyCode>>, gamepads: Res<Gamepads>, gamepad_axes: Res<Axis<GamepadAxis>>, time: Res<Time>) {
+    let (mut transform, mut animator, mut player) = characters.single_mut();
     let mut movement = Vec3::new(0.0, 0.0, 0.0);
 
-    if input.any_pressed([KeyCode::W, KeyCode::Up]) {
-        movement.y += 1.0;
+    for gamepad in gamepads.iter() {
+        movement.x = gamepad_axes.get(GamepadAxis::new(gamepad, GamepadAxisType::LeftStickX)).unwrap();
+        movement.y = gamepad_axes.get(GamepadAxis::new(gamepad, GamepadAxisType::LeftStickY)).unwrap();
     }
-    if input.any_pressed([KeyCode::S, KeyCode::Down]) {
-        movement.y -= 1.0;
-    }
-    if input.any_pressed([KeyCode::D, KeyCode::Right]) {
-        movement.x += 1.0;
-    }
-    if input.any_pressed([KeyCode::A, KeyCode::Left]) {
-        movement.x -= 1.0;
-    }
-    transform.translation += movement.normalize_or_zero() * player.speed * time.delta_seconds();
 
-    if movement.x == 0.0 {
+    if movement == Vec3::ZERO {
+        if keyboard_input.any_pressed([KeyCode::W, KeyCode::Up]) {
+            movement.y += 1.0;
+        }
+        if keyboard_input.any_pressed([KeyCode::S, KeyCode::Down]) {
+            movement.y -= 1.0;
+        }
+        if keyboard_input.any_pressed([KeyCode::D, KeyCode::Right]) {
+            movement.x += 1.0;
+        }
+        if keyboard_input.any_pressed([KeyCode::A, KeyCode::Left]) {
+            movement.x -= 1.0;
+        }
+    }
+
+    if movement.length() > 1.0 {
+        movement = movement.normalize_or_zero();
+    }
+
+    transform.translation += movement * player.speed * time.delta_seconds();
+    player.direction = Vec2::new(movement.x, movement.y).normalize_or_zero();
+    
+    if movement == Vec3::ZERO {
         // Is standing still
 
         // If not in Idle animation
-        if animator.current_animation != 0 {
-            animator.current_animation = 0;
-            animator.current_frame = 0;
-        }
+        change_animation(0, &mut animator);
         return;
     }
-    if movement.x > 0.0 {
-        // Moving to the right
+    if movement.x == 0.0 {
+        if movement.y > 0.0 {
+            // Moving up
 
-        // If not in walking right animation
-        if animator.current_animation != 1 {
-            animator.current_animation = 1;
-            animator.current_frame = 0;
+            // If not in walking up animation
+            change_animation(3, &mut animator);
+        } else {
+            // Moving down
+
+            // If not in walking down animation
+            change_animation(4, &mut animator);
+        }
+
+    } else if movement.x > 0.0 {
+        if movement.y == 0.0 {
+            // Moving to the right
+
+            // If not in walking right animation
+            change_animation(1, &mut animator);
+        } else if movement.y > 0.0 {
+            // Moving up right
+
+            // If not in walking up right animation
+            change_animation(5, &mut animator);
+        } else {
+            // Moving down right
+
+            // If not in walking down right animation
+            change_animation(7, &mut animator);
         }
     } else {
-        // Moving to the left
+        if movement.y == 0.0 {
+            // Moving to the left
 
-        // If not in walking left animation
-        if animator.current_animation != 2 {
-            animator.current_animation = 2;
-            animator.current_frame = 0;
+            // If not in walking left animation
+            change_animation(2, &mut animator);
+        } else if movement.y > 0.0 {
+            // Moving up left
+
+            // If not in walking up left animation
+            change_animation(6, &mut animator);
+        } else {
+            // Moving down left
+
+            // If not in walking down left animation
+            change_animation(8, &mut animator);
         }
+    }
+}
+
+fn change_animation(animation: usize, animator: &mut Animator) {
+    if animator.current_animation != animation {
+        animator.current_animation = animation;
+        animator.current_frame = 0;
     }
 }

@@ -4,7 +4,8 @@ use bevy::math::Vec3Swizzles;
 use bevy::prelude::{AssetServer, BuildChildren, Commands, Component, default, DespawnRecursiveExt, Entity, Handle, Image, IVec2, Plugin, Query, Res, ResMut, Resource, Transform, Update, Vec2, Vec3, With};
 use bevy::utils::HashSet;
 use bevy_ecs_tilemap::{TilemapBundle, TilemapPlugin};
-use bevy_ecs_tilemap::prelude::{TileBundle, TilemapId, TilemapRenderSettings, TilemapTexture, TilePos, TileStorage};
+use bevy_ecs_tilemap::prelude::{TileBundle, TilemapId, TilemapRenderSettings, TilemapTexture, TilePos, TileStorage, TileTextureIndex};
+use rand::{Rng, thread_rng};
 
 use crate::client::local_player::LocalPlayer;
 use crate::client::y_sorting::YSort;
@@ -32,6 +33,8 @@ struct ChunkManager {
 #[derive(Component)]
 struct Chunk;
 
+const TEXTURE_ATLAS_SIZE: u32 = 4;
+
 fn spawn_chunk(commands: &mut Commands, asset_server: &AssetServer, chunk_pos: IVec2) {
     let tilemap_entity = commands.spawn((Chunk, Name::new(format!("Chunk {} {}", chunk_pos.x, chunk_pos.y)))).id();
     let mut tile_storage = TileStorage::empty(CHUNK_SIZE.into());
@@ -41,6 +44,7 @@ fn spawn_chunk(commands: &mut Commands, asset_server: &AssetServer, chunk_pos: I
             let tile_entity = commands.spawn(TileBundle {
                 position: tile_pos,
                 tilemap_id: TilemapId(tilemap_entity),
+                texture_index: TileTextureIndex(thread_rng().gen_range(0..TEXTURE_ATLAS_SIZE)),
                 ..default()
             }).id();
             commands.entity(tilemap_entity).add_child(tile_entity);

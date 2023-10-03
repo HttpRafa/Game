@@ -47,7 +47,11 @@ pub struct Animator {
     pub timer: Timer,
 }
 
-pub fn animate_sprite(mut query: Query<(&Animations, &mut Animator, &mut Handle<TextureAtlas>, &mut TextureAtlasSprite)>, time: Res<Time>) {
+pub fn calc_animation_index(row: usize, colum: usize, row_size: usize) -> usize {
+    colum + (row * row_size)
+}
+
+fn animate_sprite(mut query: Query<(&Animations, &mut Animator, &mut Handle<TextureAtlas>, &mut TextureAtlasSprite)>, time: Res<Time>) {
     for (animations, mut animator, mut atlas, mut sprite) in &mut query.iter_mut() {
         animator.timer.tick(time.delta());
 
