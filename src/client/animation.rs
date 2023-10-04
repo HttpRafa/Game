@@ -12,10 +12,14 @@ pub struct SpriteAnimationPlugin;
 
 impl Plugin for SpriteAnimationPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Update, animate_sprite);
+        app.add_systems(Update, animate_sprite)
+            .register_type::<Animations>()
+            .register_type::<Animator>();
     }
 }
 
+#[derive(InspectorOptions, Reflect)]
+#[reflect(InspectorOptions)]
 pub struct AnimationFrame {
     pub atlas_handle: Handle<TextureAtlas>,
     pub atlas_index: usize,
@@ -32,6 +36,8 @@ impl Default for AnimationFrame {
     }
 }
 
+#[derive(InspectorOptions, Default, Reflect)]
+#[reflect(InspectorOptions)]
 pub struct Animation {
     pub frames: Vec<AnimationFrame>,
 }
@@ -42,7 +48,8 @@ pub struct Animations {
     pub animations: Vec<Animation>,
 }
 
-#[derive(Default, Component)]
+#[derive(Component, InspectorOptions, Default, Reflect)]
+#[reflect(Component, InspectorOptions)]
 pub struct Animator {
     pub current_animation: usize,
     pub last_animation: usize,
