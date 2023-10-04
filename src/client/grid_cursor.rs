@@ -32,7 +32,7 @@ fn spawn_cursor(mut commands: Commands) {
             ..default()
         },
         GridCursor,
-        Name::new("Debug Grid Cursor"),
+        Name::new("Grid Cursor"),
         YSort(-2.5)
     ));
 }

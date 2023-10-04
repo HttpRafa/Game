@@ -3,8 +3,10 @@ use bevy::app::App;
 
 use bevy::asset::Handle;
 use bevy::ecs::prelude::{Component, Query, Res};
-use bevy::prelude::{Plugin, Time, Timer, Update};
+use bevy::prelude::*;
 use bevy::sprite::{TextureAtlas, TextureAtlasSprite};
+use bevy_inspector_egui::InspectorOptions;
+use bevy_inspector_egui::prelude::ReflectInspectorOptions;
 
 pub struct SpriteAnimationPlugin;
 
@@ -34,7 +36,8 @@ pub struct Animation {
     pub frames: Vec<AnimationFrame>,
 }
 
-#[derive(Component)]
+#[derive(Component, InspectorOptions, Default, Reflect)]
+#[reflect(Component, InspectorOptions)]
 pub struct Animations {
     pub animations: Vec<Animation>,
 }
