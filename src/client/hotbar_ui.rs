@@ -1,8 +1,10 @@
 use bevy::app::App;
 use bevy::core::Name;
-use bevy::prelude::{Assets, AssetServer, AtlasImageBundle, BuildChildren, ButtonBundle, Changed, Children, Color, Commands, Component, Interaction, JustifyContent, NodeBundle, Plugin, Query, Res, ResMut, Startup, Style, TextureAtlas, UiRect, UiTextureAtlasImage, Update, Val, Vec2, With};
+use bevy::prelude::{AtlasImageBundle, BuildChildren, ButtonBundle, Changed, Children, Color, Commands, Component, Interaction, JustifyContent, NodeBundle, Plugin, Query, Res, Startup, Style, UiRect, UiTextureAtlasImage, Update, Val, With};
 use bevy::ui::PositionType;
 use bevy::utils::default;
+
+use crate::client::textures::GameTextures;
 
 pub struct HotbarUIPlugin;
 
@@ -33,9 +35,7 @@ fn handle_hover_and_click(interaction: Query<(&Interaction, &Children), (Changed
     }
 }
 
-fn spawn_ui(mut commands: Commands, asset_server: Res<AssetServer>, mut texture_atlases: ResMut<Assets<TextureAtlas>>) {
-    let hotbar_texture_atlas = texture_atlases.add(TextureAtlas::from_grid(asset_server.load("ui/hotbar/hotbar.png"), Vec2::new(16.0, 16.0), 3, 1, None, None));
-
+fn spawn_ui(mut commands: Commands, textures: Res<GameTextures>) {
     commands.spawn((NodeBundle {
         style: Style {
             position_type: PositionType::Absolute,
@@ -73,7 +73,7 @@ fn spawn_ui(mut commands: Commands, asset_server: Res<AssetServer>, mut texture_
                     ..default()
                 }, Name::new(format!("Slot {}", x)), Slot)).with_children(|commands| {
                     commands.spawn(AtlasImageBundle {
-                        texture_atlas: hotbar_texture_atlas.clone(),
+                        texture_atlas: textures.ui_inventory.clone(),
                         ..default()
                     });
                 });

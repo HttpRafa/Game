@@ -9,6 +9,7 @@ use bevy_inspector_egui::prelude::ReflectInspectorOptions;
 
 use crate::client::animation::{Animation, AnimationFrame, Animations, Animator, calc_animation_index};
 use crate::client::remote_player::Player;
+use crate::client::textures::GameTextures;
 use crate::client::y_sorting::YSort;
 use crate::common::TILE_SIZE;
 
@@ -63,9 +64,7 @@ fn scroll_camera(mut projection: Query<&mut OrthographicProjection, (With<Camera
     projection.scale = (projection.scale + movement / 7.5).clamp(MIN_ZOOM, MAX_ZOOM);
 }
 
-const TEXTURE_COLUMN_AMOUNT: usize = 3;
-
-fn spawn_player(mut commands: Commands, asset_server: Res<AssetServer>, mut texture_atlases: ResMut<Assets<TextureAtlas>>) {
+fn spawn_player(mut commands: Commands, textures: Res<GameTextures>) {
     // Create camera
     let mut camera = (
         Camera2dBundle::default(),
@@ -76,10 +75,6 @@ fn spawn_player(mut commands: Commands, asset_server: Res<AssetServer>, mut text
         min_height: 180.0
     };
 
-    // Load idle texture atlas
-    let idle_texture_atlas = texture_atlases.add(TextureAtlas::from_grid(asset_server.load("animations/player/idle.png"), Vec2::new(16.0, 16.0), 5, 1, None, None));
-    let walk_texture_atlas = texture_atlases.add(TextureAtlas::from_grid(asset_server.load("animations/player/walking.png"), Vec2::new(16.0, 16.0), 3, 8, None, None));
-
     // Spawn local player
     commands.spawn(LocalPlayerBundle {
         y_sort: YSort::default(),
@@ -88,7 +83,7 @@ fn spawn_player(mut commands: Commands, asset_server: Res<AssetServer>, mut text
                 custom_size: Some(Vec2::new(TILE_SIZE.x * 1.5, TILE_SIZE.y * 1.5)),
                 ..default()
             },
-            texture_atlas: idle_texture_atlas.clone(),
+            texture_atlas: textures.player_idle.clone(),
             ..default()
         },
         local_player: LocalPlayer {
@@ -100,23 +95,23 @@ fn spawn_player(mut commands: Commands, asset_server: Res<AssetServer>, mut text
         animations: Animations {
             animations: vec![
                 // Idle animation
-                gen_animation(&idle_texture_atlas, 0, 2, 0.55),
+                gen_animation(&textures.player_idle, 0, 2, 0.55),
                 // Walk right animation
-                gen_animation(&walk_texture_atlas, 0, 3, 0.25),
+                gen_animation(&textures.player_walking, 0, 3, 0.25),
                 // Walk left animation
-                gen_animation(&walk_texture_atlas, 1, 3, 0.25),
+                gen_animation(&textures.player_walking, 1, 3, 0.25),
                 // Walk up animation
-                gen_animation(&walk_texture_atlas, 2, 3, 0.25),
+                gen_animation(&textures.player_walking, 2, 3, 0.25),
                 // Walk down animation
-                gen_animation(&walk_texture_atlas, 3, 3, 0.25),
+                gen_animation(&textures.player_walking, 3, 3, 0.25),
                 // Walk up right animation
-                gen_animation(&walk_texture_atlas, 4, 3, 0.25),
+                gen_animation(&textures.player_walking, 4, 3, 0.25),
                 // Walk up left animation
-                gen_animation(&walk_texture_atlas, 5, 3, 0.25),
+                gen_animation(&textures.player_walking, 5, 3, 0.25),
                 // Walk down right animation
-                gen_animation(&walk_texture_atlas, 6, 3, 0.25),
+                gen_animation(&textures.player_walking, 6, 3, 0.25),
                 // Walk down left animation
-                gen_animation(&walk_texture_atlas, 7, 3, 0.25),
+                gen_animation(&textures.player_walking, 7, 3, 0.25),
             ]
         },
         name: Name::new("LocalPlayer"),
@@ -131,7 +126,7 @@ fn gen_animation(texture: &Handle<TextureAtlas>, row: usize, colum_amount: usize
     for colum in 0..colum_amount {
         frames.push(AnimationFrame {
             atlas_handle: texture.clone(),
-            atlas_index: calc_animation_index(row, colum, TEXTURE_COLUMN_AMOUNT),
+            atlas_index: calc_animation_index(row, colum, colum_amount),
             duration: Duration::from_secs_f32(duration),
             ..default()
         });

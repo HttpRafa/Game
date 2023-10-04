@@ -1,13 +1,14 @@
 use bevy::app::App;
 use bevy::core::Name;
 use bevy::math::Vec3Swizzles;
-use bevy::prelude::{AssetServer, BuildChildren, Commands, Component, default, DespawnRecursiveExt, Entity, Handle, Image, IVec2, Plugin, Query, Res, ResMut, Resource, Transform, Update, Vec2, Vec3, With};
+use bevy::prelude::{BuildChildren, Commands, Component, default, DespawnRecursiveExt, Entity, IVec2, Plugin, Query, Res, ResMut, Resource, Transform, Update, Vec2, Vec3, With};
 use bevy::utils::HashSet;
 use bevy_ecs_tilemap::{TilemapBundle, TilemapPlugin};
 use bevy_ecs_tilemap::prelude::{TileBundle, TilemapId, TilemapRenderSettings, TilemapTexture, TilePos, TileStorage, TileTextureIndex};
 use rand::{Rng, thread_rng};
 
 use crate::client::local_player::LocalPlayer;
+use crate::client::textures::{GameTextures, WORLD_GROUND_TILES};
 use crate::client::y_sorting::YSort;
 use crate::common::{CHUNK_LOAD_SIZE, CHUNK_SIZE, RENDER_CHUNK_SIZE, TILE_SIZE};
 
@@ -33,9 +34,7 @@ struct ChunkManager {
 #[derive(Component)]
 struct Chunk;
 
-const TEXTURE_ATLAS_SIZE: u32 = 4;
-
-fn spawn_chunk(commands: &mut Commands, asset_server: &AssetServer, chunk_pos: IVec2) {
+fn spawn_chunk(commands: &mut Commands, textures: &GameTextures, chunk_pos: IVec2) {
     let tilemap_entity = commands.spawn((Chunk, Name::new(format!("Chunk {} {}", chunk_pos.x, chunk_pos.y)))).id();
     let mut tile_storage = TileStorage::empty(CHUNK_SIZE.into());
     for x in 0..CHUNK_SIZE.x {
@@ -44,7 +43,7 @@ fn spawn_chunk(commands: &mut Commands, asset_server: &AssetServer, chunk_pos: I
             let tile_entity = commands.spawn(TileBundle {
                 position: tile_pos,
                 tilemap_id: TilemapId(tilemap_entity),
-                texture_index: TileTextureIndex(thread_rng().gen_range(0..TEXTURE_ATLAS_SIZE)),
+                texture_index: TileTextureIndex(thread_rng().gen_range(0..WORLD_GROUND_TILES.columns as u32)),
                 ..default()
             }).id();
             commands.entity(tilemap_entity).add_child(tile_entity);
@@ -57,26 +56,25 @@ fn spawn_chunk(commands: &mut Commands, asset_server: &AssetServer, chunk_pos: I
         chunk_pos.y as f32 * CHUNK_SIZE.y as f32 * TILE_SIZE.y,
         0.0,
     ));
-    let texture_handle: Handle<Image> = asset_server.load("world/textures/dirt.png");
     commands.entity(tilemap_entity).insert((TilemapBundle {
         grid_size: TILE_SIZE.into(),
         size: CHUNK_SIZE.into(),
         storage: tile_storage,
-        texture: TilemapTexture::Single(texture_handle.clone()),
+        texture: TilemapTexture::Single(textures.world_ground_tiles.clone()),
         tile_size: TILE_SIZE,
         transform,
         ..default()
     }, YSort(-5.0)));
 }
 
-fn spawn_chunks_around_player(mut commands: Commands, asset_server: Res<AssetServer>, player_transform: Query<&Transform, With<LocalPlayer>>, mut chunk_manager: ResMut<ChunkManager>) {
+fn spawn_chunks_around_player(mut commands: Commands, textures: Res<GameTextures>, player_transform: Query<&Transform, With<LocalPlayer>>, mut chunk_manager: ResMut<ChunkManager>) {
     let player_transform = player_transform.single();
     let chunk_position = world_to_chunk_position(&player_transform.translation.xy());
     for x in (chunk_position.x - CHUNK_LOAD_SIZE.x as i32)..(chunk_position.x + CHUNK_LOAD_SIZE.x as i32) {
         for y in (chunk_position.y - CHUNK_LOAD_SIZE.y as i32)..(chunk_position.y + CHUNK_LOAD_SIZE.y as i32) {
             if !chunk_manager.spawned_chunks.contains(&IVec2::new(x, y)) {
                 chunk_manager.spawned_chunks.insert(IVec2::new(x, y));
-                spawn_chunk(&mut commands, &asset_server, IVec2::new(x, y));
+                spawn_chunk(&mut commands, &textures, IVec2::new(x, y));
             }
         }
     }
