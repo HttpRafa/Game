@@ -1,19 +1,24 @@
 use bevy::app::App;
 use bevy::core::Name;
-use bevy::prelude::{AtlasImageBundle, BuildChildren, ButtonBundle, Changed, Children, Color, Commands, Component, Interaction, JustifyContent, NodeBundle, Plugin, Query, Res, Startup, Style, UiRect, UiTextureAtlasImage, Update, Val, With};
+use bevy::prelude::*;
 use bevy::ui::PositionType;
 use bevy::utils::default;
+use crate::client::GameState;
 
 use crate::client::textures::GameTextures;
 
-pub struct HotbarUIPlugin;
+pub struct InGameUIPlugin;
 
-impl Plugin for HotbarUIPlugin {
+impl Plugin for InGameUIPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Startup, spawn_ui)
-            .add_systems(Update, handle_hover_and_click);
+        app.add_systems(OnEnter(GameState::InGame), setup_ui)
+            .add_systems(OnExit(GameState::InGame), cleanup_ui)
+            .add_systems(Update, handle_hover_and_click.run_if(in_state(GameState::InGame)));
     }
 }
+
+#[derive(Component)]
+struct UIRoot;
 
 #[derive(Component)]
 struct Slot;
@@ -35,7 +40,7 @@ fn handle_hover_and_click(interaction: Query<(&Interaction, &Children), (Changed
     }
 }
 
-fn spawn_ui(mut commands: Commands, textures: Res<GameTextures>) {
+fn setup_ui(mut commands: Commands, textures: Res<GameTextures>) {
     commands.spawn((NodeBundle {
         style: Style {
             position_type: PositionType::Absolute,
@@ -46,7 +51,7 @@ fn spawn_ui(mut commands: Commands, textures: Res<GameTextures>) {
             ..default()
         },
         ..default()
-    }, Name::new("UI Root"))).with_children(|commands| {
+    }, UIRoot, Name::new("UI Root"))).with_children(|commands| {
         commands.spawn((NodeBundle {
             style: Style {
                 position_type: PositionType::Absolute,
@@ -80,4 +85,10 @@ fn spawn_ui(mut commands: Commands, textures: Res<GameTextures>) {
             }
         });
     });
+}
+
+fn cleanup_ui(mut commands: Commands, roots: Query<Entity, With<UIRoot>>) {
+    for root in &roots {
+        commands.entity(root).despawn_recursive();
+    }
 }

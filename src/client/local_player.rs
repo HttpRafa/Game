@@ -8,6 +8,7 @@ use bevy_inspector_egui::InspectorOptions;
 use bevy_inspector_egui::prelude::ReflectInspectorOptions;
 
 use crate::client::animation::{Animation, AnimationFrame, Animations, Animator, calc_animation_index};
+use crate::client::GameState;
 use crate::client::remote_player::Player;
 use crate::client::textures::GameTextures;
 use crate::client::y_sorting::YSort;
@@ -17,9 +18,9 @@ pub struct LocalPlayerPlugin;
 
 impl Plugin for LocalPlayerPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Startup, spawn_player)
-            .add_systems(Update, player_movement)
-            .add_systems(Update, scroll_camera)
+        app.add_systems(OnEnter(GameState::InGame), setup_player)
+            .add_systems(Update, player_movement.run_if(in_state(GameState::InGame)))
+            .add_systems(Update, scroll_camera.run_if(in_state(GameState::InGame)))
             .register_type::<LocalPlayer>();
     }
 }
@@ -64,7 +65,7 @@ fn scroll_camera(mut projection: Query<&mut OrthographicProjection, (With<Camera
     projection.scale = (projection.scale + movement / 7.5).clamp(MIN_ZOOM, MAX_ZOOM);
 }
 
-fn spawn_player(mut commands: Commands, textures: Res<GameTextures>) {
+fn setup_player(mut commands: Commands, textures: Res<GameTextures>) {
     // Create camera
     let mut camera = (
         Camera2dBundle::default(),

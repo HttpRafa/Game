@@ -1,12 +1,13 @@
 use bevy::app::App;
 use bevy::core::Name;
 use bevy::math::Vec3Swizzles;
-use bevy::prelude::{BuildChildren, Commands, Component, default, DespawnRecursiveExt, Entity, IVec2, Plugin, Query, Res, ResMut, Resource, Transform, Update, Vec2, Vec3, With};
+use bevy::prelude::{BuildChildren, Commands, Component, default, DespawnRecursiveExt, Entity, in_state, IntoSystemConfigs, IVec2, OnExit, Plugin, Query, Res, ResMut, Resource, Transform, Update, Vec2, Vec3, With};
 use bevy::utils::HashSet;
 use bevy_ecs_tilemap::{TilemapBundle, TilemapPlugin};
 use bevy_ecs_tilemap::prelude::{TileBundle, TilemapId, TilemapRenderSettings, TilemapTexture, TilePos, TileStorage, TileTextureIndex};
 use rand::{Rng, thread_rng};
 
+use crate::client::GameState;
 use crate::client::local_player::LocalPlayer;
 use crate::client::textures::{GameTextures, WORLD_GROUND_TILES};
 use crate::client::y_sorting::YSort;
@@ -21,8 +22,9 @@ impl Plugin for WorldPlugin {
             ..default()
         }).add_plugins(TilemapPlugin)
             .insert_resource(ChunkManager::default())
-            .add_systems(Update, spawn_chunks_around_player)
-            .add_systems(Update, despawn_chunks);
+            .add_systems(OnExit(GameState::InGame), cleanup_chunks)
+            .add_systems(Update, spawn_chunks_around_player.run_if(in_state(GameState::InGame)))
+            .add_systems(Update, despawn_chunks.run_if(in_state(GameState::InGame)));
     }
 }
 
@@ -92,6 +94,13 @@ fn despawn_chunks(mut commands: Commands, player_transform: Query<&Transform, Wi
             commands.entity(entity).despawn_recursive();
         }
     }
+}
+
+fn cleanup_chunks(mut commands: Commands, chunks: Query<Entity, With<Chunk>>, mut chunk_manager: ResMut<ChunkManager>) {
+    for chunk in &chunks {
+        commands.entity(chunk).despawn_recursive();
+    }
+    chunk_manager.spawned_chunks.clear();
 }
 
 pub fn world_to_chunk_position(camera_position: &Vec2) -> IVec2 {
