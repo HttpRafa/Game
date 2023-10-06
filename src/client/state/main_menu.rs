@@ -1,6 +1,6 @@
 use bevy::app::App;
 use bevy::prelude::{Commands, OnEnter, OnExit, Plugin};
-use crate::client::GameState;
+use crate::client::state::GameState;
 
 pub struct MainMenuPlugin;
 

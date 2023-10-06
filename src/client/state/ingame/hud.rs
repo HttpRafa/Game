@@ -3,13 +3,12 @@ use bevy::core::Name;
 use bevy::prelude::*;
 use bevy::ui::PositionType;
 use bevy::utils::default;
-use crate::client::GameState;
+use crate::client::state::GameState;
+use crate::client::texture::GameTextures;
 
-use crate::client::textures::GameTextures;
+pub struct HudPlugin;
 
-pub struct InGameUIPlugin;
-
-impl Plugin for InGameUIPlugin {
+impl Plugin for HudPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(OnEnter(GameState::InGame), setup_ui)
             .add_systems(OnExit(GameState::InGame), cleanup_ui)

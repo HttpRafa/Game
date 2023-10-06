@@ -6,10 +6,10 @@ use bevy::utils::HashSet;
 use bevy_ecs_tilemap::{TilemapBundle, TilemapPlugin};
 use bevy_ecs_tilemap::prelude::{TileBundle, TilemapId, TilemapRenderSettings, TilemapTexture, TilePos, TileStorage, TileTextureIndex};
 use rand::{Rng, thread_rng};
+use crate::client::state::GameState;
+use crate::client::state::ingame::local_player::LocalPlayer;
+use crate::client::texture::{GameTextures, WORLD_GROUND_TILES};
 
-use crate::client::GameState;
-use crate::client::local_player::LocalPlayer;
-use crate::client::textures::{GameTextures, WORLD_GROUND_TILES};
 use crate::client::y_sorting::YSort;
 use crate::common::{CHUNK_LOAD_SIZE, CHUNK_SIZE, RENDER_CHUNK_SIZE, TILE_SIZE};
 

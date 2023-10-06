@@ -1,16 +1,14 @@
 use std::time::Duration;
 
 use bevy::app::App;
-use bevy::input::mouse::{MouseScrollUnit, MouseWheel};
 use bevy::prelude::*;
-use bevy::render::camera::ScalingMode;
 use bevy_inspector_egui::InspectorOptions;
 use bevy_inspector_egui::prelude::ReflectInspectorOptions;
 
 use crate::client::animation::{Animation, AnimationFrame, Animations, Animator, calc_animation_index};
-use crate::client::GameState;
-use crate::client::remote_player::Player;
-use crate::client::textures::GameTextures;
+use crate::client::state::GameState;
+use crate::client::state::ingame::remote_player::Player;
+use crate::client::texture::GameTextures;
 use crate::client::y_sorting::YSort;
 use crate::common::TILE_SIZE;
 
@@ -19,8 +17,8 @@ pub struct LocalPlayerPlugin;
 impl Plugin for LocalPlayerPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(OnEnter(GameState::InGame), setup_player)
+            .add_systems(OnExit(GameState::InGame), cleanup_player)
             .add_systems(Update, player_movement.run_if(in_state(GameState::InGame)))
-            .add_systems(Update, scroll_camera.run_if(in_state(GameState::InGame)))
             .register_type::<LocalPlayer>();
     }
 }
@@ -33,10 +31,6 @@ pub struct LocalPlayer {
     pub direction: Vec2,
 }
 
-#[derive(Component, InspectorOptions, Default, Reflect)]
-#[reflect(Component, InspectorOptions)]
-pub struct MainCamera;
-
 #[derive(Bundle)]
 struct LocalPlayerBundle {
     y_sort: YSort,
@@ -48,34 +42,7 @@ struct LocalPlayerBundle {
     name: Name
 }
 
-const MIN_ZOOM: f32 = 0.75;
-const MAX_ZOOM: f32 = 2.5;
-
-fn scroll_camera(mut projection: Query<&mut OrthographicProjection, (With<Camera>, With<MainCamera>)>, mut scroll: EventReader<MouseWheel>) {
-    let mut projection = projection.single_mut();
-    let mut movement = 0.0;
-    for event in scroll.iter() {
-        match event.unit {
-            MouseScrollUnit::Line => {
-                movement -= event.y;
-            }
-            _ => {}
-        }
-    }
-    projection.scale = (projection.scale + movement / 7.5).clamp(MIN_ZOOM, MAX_ZOOM);
-}
-
 fn setup_player(mut commands: Commands, textures: Res<GameTextures>) {
-    // Create camera
-    let mut camera = (
-        Camera2dBundle::default(),
-        MainCamera
-    );
-    camera.0.projection.scaling_mode = ScalingMode::AutoMin {
-        min_width: 320.0,
-        min_height: 180.0
-    };
-
     // Spawn local player
     commands.spawn(LocalPlayerBundle {
         y_sort: YSort::default(),
@@ -116,9 +83,13 @@ fn setup_player(mut commands: Commands, textures: Res<GameTextures>) {
             ]
         },
         name: Name::new("LocalPlayer"),
-    }).with_children(|commands| {
-        commands.spawn(camera);
     });
+}
+
+fn cleanup_player(mut commands: Commands, players: Query<Entity, With<LocalPlayer>>) {
+    for entity in &players {
+        commands.entity(entity).despawn_recursive();
+    }
 }
 
 fn gen_animation(texture: &Handle<TextureAtlas>, row: usize, colum_amount: usize, duration: f32) -> Animation {
