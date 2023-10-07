@@ -5,9 +5,9 @@ use crate::client::state::ingame::hud::HudPlugin;
 use crate::client::state::ingame::local_player::LocalPlayerPlugin;
 use crate::client::state::ingame::main_camera::MainCameraPlugin;
 use crate::client::state::ingame::remote_player::RemotePlayerPlugin;
-use crate::client::state::ingame::world::WorldPlugin;
+use crate::client::state::ingame::remote_world::WorldPlugin;
 
-mod world;
+mod remote_world;
 mod remote_player;
 mod local_player;
 mod hud;

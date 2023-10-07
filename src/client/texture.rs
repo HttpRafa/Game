@@ -7,7 +7,7 @@ const VEC_10: Vec2 = Vec2::new(10.0, 10.0);
 pub const PLAYER_IDLE_ANIMATION: GameAtlas = GameAtlas::new("texture/animation/player/idle.png", VEC_16, 2,  1);
 pub const PLAYER_WALKING_ANIMATION: GameAtlas = GameAtlas::new("texture/animation/player/walking.png", VEC_16, 3, 8);
 pub const UI_INVENTORY: GameAtlas = GameAtlas::new("texture/ui/inventory.png", VEC_16, 3, 1);
-pub const WORLD_GROUND_TILES: GameAtlas = GameAtlas::new("texture/world/ground_tiles.png", VEC_10, 5, 1);
+pub const WORLD_GROUND_TILES: GameAtlas = GameAtlas::new("texture/world/ground_tiles.png", VEC_10, 5, 3);
 
 pub struct TexturesPlugin;
 

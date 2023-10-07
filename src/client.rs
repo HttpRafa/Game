@@ -13,6 +13,7 @@ mod state;
 mod animation;
 mod texture;
 mod y_sorting;
+mod world;
 
 pub struct ClientPlugin;
 

@@ -51,17 +51,15 @@ fn follow_player(mut camera_transform: Query<(&Camera, &GlobalTransform, &mut Tr
     let player_position = player_transform.single().translation;
     let window = window.single();
 
+    let mut offset = Vec3::ZERO;
     if let Some(world_position) = window.cursor_position()
         .and_then(|cursor| camera.viewport_to_world(global_transform, cursor))
         .map(|ray| ray.origin.truncate()) {
         let world_position = Vec3::new(world_position.x, world_position.y, 0.0);
-        let mut offset = (world_position - player_position) / 15.0;
-        if offset.length() < 2.5 {
-            offset = Vec3::ZERO;
-        }
-
-        camera_transform.translation = camera_transform.translation.lerp(player_position + offset, time.delta_seconds() * 2.5);
+        offset = (world_position - player_position) / 15.0;
     }
+
+    camera_transform.translation = camera_transform.translation.lerp(player_position + offset, time.delta_seconds() * 10.0);
 }
 
 fn setup_camera(mut commands: Commands) {

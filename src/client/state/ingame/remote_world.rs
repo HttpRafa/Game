@@ -1,16 +1,14 @@
 use bevy::app::App;
-use bevy::core::Name;
 use bevy::math::Vec3Swizzles;
-use bevy::prelude::{BuildChildren, Commands, Component, default, DespawnRecursiveExt, Entity, in_state, IntoSystemConfigs, IVec2, OnExit, Plugin, Query, Res, ResMut, Resource, Transform, Update, Vec2, Vec3, With};
+use bevy::prelude::{Commands, default, DespawnRecursiveExt, Entity, in_state, IntoSystemConfigs, IVec2, OnExit, Plugin, Query, Res, ResMut, Resource, Transform, Update, With};
 use bevy::utils::HashSet;
-use bevy_ecs_tilemap::{TilemapBundle, TilemapPlugin};
-use bevy_ecs_tilemap::prelude::{TileBundle, TilemapId, TilemapRenderSettings, TilemapTexture, TilePos, TileStorage, TileTextureIndex};
-use rand::{Rng, thread_rng};
+use bevy_ecs_tilemap::TilemapPlugin;
+use bevy_ecs_tilemap::prelude::TilemapRenderSettings;
+
 use crate::client::state::GameState;
 use crate::client::state::ingame::local_player::LocalPlayer;
-use crate::client::texture::{GameTextures, WORLD_GROUND_TILES};
-
-use crate::client::y_sorting::YSort;
+use crate::client::texture::GameTextures;
+use crate::client::world::{Chunk, spawn_chunk, world_to_chunk_position};
 use crate::common::{CHUNK_LOAD_SIZE, CHUNK_SIZE, RENDER_CHUNK_SIZE, TILE_SIZE};
 
 pub struct WorldPlugin;
@@ -33,42 +31,6 @@ struct ChunkManager {
     pub spawned_chunks: HashSet<IVec2>,
 }
 
-#[derive(Component)]
-struct Chunk;
-
-fn spawn_chunk(commands: &mut Commands, textures: &GameTextures, chunk_pos: IVec2) {
-    let tilemap_entity = commands.spawn((Chunk, Name::new(format!("Chunk {} {}", chunk_pos.x, chunk_pos.y)))).id();
-    let mut tile_storage = TileStorage::empty(CHUNK_SIZE.into());
-    for x in 0..CHUNK_SIZE.x {
-        for y in 0..CHUNK_SIZE.x {
-            let tile_pos = TilePos { x, y};
-            let tile_entity = commands.spawn(TileBundle {
-                position: tile_pos,
-                tilemap_id: TilemapId(tilemap_entity),
-                texture_index: TileTextureIndex(thread_rng().gen_range(0..WORLD_GROUND_TILES.columns as u32)),
-                ..default()
-            }).id();
-            commands.entity(tilemap_entity).add_child(tile_entity);
-            tile_storage.set(&tile_pos, tile_entity);
-        }
-    }
-
-    let transform = Transform::from_translation(Vec3::new(
-        chunk_pos.x as f32 * CHUNK_SIZE.x as f32 * TILE_SIZE.x,
-        chunk_pos.y as f32 * CHUNK_SIZE.y as f32 * TILE_SIZE.y,
-        0.0,
-    ));
-    commands.entity(tilemap_entity).insert((TilemapBundle {
-        grid_size: TILE_SIZE.into(),
-        size: CHUNK_SIZE.into(),
-        storage: tile_storage,
-        texture: TilemapTexture::Single(textures.world_ground_tiles.clone()),
-        tile_size: TILE_SIZE,
-        transform,
-        ..default()
-    }, YSort(-5.0)));
-}
-
 fn spawn_chunks_around_player(mut commands: Commands, textures: Res<GameTextures>, player_transform: Query<&Transform, With<LocalPlayer>>, mut chunk_manager: ResMut<ChunkManager>) {
     let player_transform = player_transform.single();
     let chunk_position = world_to_chunk_position(&player_transform.translation.xy());
@@ -76,7 +38,7 @@ fn spawn_chunks_around_player(mut commands: Commands, textures: Res<GameTextures
         for y in (chunk_position.y - CHUNK_LOAD_SIZE.y as i32)..(chunk_position.y + CHUNK_LOAD_SIZE.y as i32) {
             if !chunk_manager.spawned_chunks.contains(&IVec2::new(x, y)) {
                 chunk_manager.spawned_chunks.insert(IVec2::new(x, y));
-                spawn_chunk(&mut commands, &textures, IVec2::new(x, y));
+                spawn_chunk(IVec2::new(x, y), Chunk::default(), &mut commands, &textures);
             }
         }
     }
@@ -101,8 +63,4 @@ fn cleanup_chunks(mut commands: Commands, chunks: Query<Entity, With<Chunk>>, mu
         commands.entity(chunk).despawn_recursive();
     }
     chunk_manager.spawned_chunks.clear();
-}
-
-pub fn world_to_chunk_position(camera_position: &Vec2) -> IVec2 {
-    camera_position.as_ivec2() / (IVec2::new(CHUNK_SIZE.x as i32, CHUNK_SIZE.y as i32) * IVec2::new(TILE_SIZE.x as i32, TILE_SIZE.y as i32))
 }
