@@ -9,18 +9,30 @@ on:
 jobs:
   build:
     runs-on: self-hosted
+    strategy:
+      matrix:
+        target: ["x86_64-unknown-linux-gnu", "x86_64-pc-windows-gnu"]
     steps:
-    - uses: actions/checkout@v3
-    - uses: ConorMacBride/install-package@v1
-      with:
-        apt: pkg-config libasound2-dev libudev-dev
-    - uses: actions-rs/toolchain@v1
-      with:
-        toolchain: stable
-    - uses: actions-rs/cargo@v1
-      with:
-        command: build
-        args: --release
-    - uses: actions-rs/cargo@v1
-      with:
-        command: test
+      - uses: actions/checkout@v3
+      - uses: ConorMacBride/install-package@v1
+        with:
+          apt: pkg-config libasound2-dev libudev-dev mingw-w64 zip
+      - uses: dtolnay/rust-toolchain@stable
+      - name: "Build project"
+        run: |
+          rustup target add ${{ matrix.target }}
+          cargo build --release --target ${{ matrix.target }}
+      - name: "Create linux zip"
+        if: matrix.target == 'x86_64-unknown-linux-gnu'
+        run: |
+          mv target/${{ matrix.target }}/release/game game
+          zip -r dist.zip assets game
+      - name: "Create windows zip"
+        if: matrix.target == 'x86_64-pc-windows-gnu'
+        run: |
+          mv target/${{ matrix.target }}/release/game.exe game.exe
+          zip -r dist.zip assets game.exe
+      - uses: actions/upload-artifact@v3
+        with:
+          name: distribution
+          path: dist.zip
