@@ -40,7 +40,7 @@ fn cleanup_screen(mut commands: Commands, mut menu_state: ResMut<NextState<MainM
     menu_state.set(MainMenuState::None);
 
     for entity in &chunks {
-        //commands.entity(entity).despawn_recursive();
+        commands.entity(entity).despawn();
     }
 }
 

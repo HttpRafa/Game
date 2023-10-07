@@ -11,6 +11,9 @@ jobs:
     runs-on: self-hosted
     steps:
     - uses: actions/checkout@v3
+    - uses: ConorMacBride/install-package@v1
+      with:
+        apt: pkg-config
     - uses: actions-rs/toolchain@v1
       with:
         toolchain: stable

@@ -5,6 +5,7 @@ use bevy::prelude::*;
 use bevy::utils::default;
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 use animation::SpriteAnimationPlugin;
+use crate::client::camera::GameCameraPlugin;
 use crate::client::state::StatePlugin;
 use crate::client::texture::TexturesPlugin;
 use crate::client::y_sorting::YSortPlugin;
@@ -14,6 +15,7 @@ mod animation;
 mod texture;
 mod y_sorting;
 mod world;
+mod camera;
 
 pub struct ClientPlugin;
 
@@ -33,7 +35,7 @@ impl Plugin for ClientPlugin {
             )
             //.add_plugins((LogDiagnosticsPlugin::default(), FrameTimeDiagnosticsPlugin::default()))
             .add_plugins(WorldInspectorPlugin::default().run_if(input_toggle_active(false, KeyCode::Escape)))
-            .add_plugins((TexturesPlugin, YSortPlugin, SpriteAnimationPlugin, StatePlugin)) // Core ingame features
+            .add_plugins((TexturesPlugin, YSortPlugin, SpriteAnimationPlugin, StatePlugin, GameCameraPlugin)) // Core ingame features
             .add_systems(Startup, init_client);
     }
 }

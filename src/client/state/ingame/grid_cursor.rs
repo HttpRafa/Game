@@ -4,8 +4,8 @@ use bevy::prelude::*;
 use bevy::utils::default;
 use bevy_inspector_egui::InspectorOptions;
 use bevy_inspector_egui::prelude::ReflectInspectorOptions;
+use crate::client::camera::MainCamera;
 use crate::client::state::GameState;
-use crate::client::state::ingame::main_camera::MainCamera;
 use crate::client::y_sorting::YSort;
 use crate::common::TILE_SIZE;
 
