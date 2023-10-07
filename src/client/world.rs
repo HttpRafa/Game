@@ -4,7 +4,7 @@ use bevy_ecs_tilemap::TilemapBundle;
 use bevy_inspector_egui::InspectorOptions;
 use bevy_inspector_egui::prelude::ReflectInspectorOptions;
 use rand::{Rng, thread_rng};
-use crate::client::texture::{GameTextures, WORLD_GROUND_TILES};
+use crate::client::asset::{GameTextures, WORLD_GROUND_TILES};
 use crate::client::y_sorting::YSort;
 use crate::common::{CHUNK_SIZE, TILE_SIZE};
 

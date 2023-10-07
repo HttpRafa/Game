@@ -1,7 +1,9 @@
 use bevy::app::App;
 use bevy::core::Name;
-use bevy::prelude::{AlignItems, BackgroundColor, BuildChildren, Button, ButtonBundle, Changed, Color, Commands, Component, DespawnRecursiveExt, Entity, in_state, Interaction, IntoSystemConfigs, JustifyContent, NextState, NodeBundle, OnEnter, OnExit, Plugin, Query, ResMut, Style, TextBundle, TextStyle, Update, Val, With};
+use bevy::prelude::{AlignItems, BackgroundColor, BuildChildren, Button, ButtonBundle, Changed, Color, Commands, Component, DespawnRecursiveExt, Entity, in_state, Interaction, IntoSystemConfigs, JustifyContent, NextState, NodeBundle, OnEnter, OnExit, Plugin, Query, Res, ResMut, Style, TextBundle, TextStyle, Update, Val, With};
 use bevy::utils::default;
+use bevy_kira_audio::{AudioChannel, AudioControl};
+use crate::client::asset::{GameSounds, UIChannel};
 
 use crate::client::state::GameState;
 use crate::client::state::main_menu::MainMenuState;
@@ -23,15 +25,17 @@ const NORMAL_BUTTON: Color = Color::rgb(0.15, 0.15, 0.15);
 const HOVERED_BUTTON: Color = Color::rgb(0.25, 0.25, 0.25);
 const PRESSED_BUTTON: Color = Color::rgb(0.35, 0.75, 0.35);
 
-fn handle_interaction(mut game_state: ResMut<NextState<GameState>>, mut interaction_query: Query<(&Interaction, &mut BackgroundColor), (Changed<Interaction>, With<Button>)>) {
+fn handle_interaction(mut game_state: ResMut<NextState<GameState>>, mut interaction_query: Query<(&Interaction, &mut BackgroundColor), (Changed<Interaction>, With<Button>)>, sounds: Res<GameSounds>, audio: Res<AudioChannel<UIChannel>>) {
     for (interaction, mut color) in &mut interaction_query {
         match *interaction {
             Interaction::Pressed => {
                 *color = PRESSED_BUTTON.into();
                 game_state.set(GameState::InGame);
+                audio.play(sounds.ui_click.clone());
             }
             Interaction::Hovered => {
                 *color = HOVERED_BUTTON.into();
+                audio.play(sounds.ui_hover.clone());
             }
             Interaction::None => {
                 *color = NORMAL_BUTTON.into();

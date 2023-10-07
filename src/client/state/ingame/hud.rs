@@ -3,8 +3,9 @@ use bevy::core::Name;
 use bevy::prelude::*;
 use bevy::ui::PositionType;
 use bevy::utils::default;
+use bevy_kira_audio::{AudioChannel, AudioControl};
 use crate::client::state::GameState;
-use crate::client::texture::GameTextures;
+use crate::client::asset::{GameSounds, GameTextures, UIChannel};
 
 pub struct HudPlugin;
 
@@ -22,15 +23,17 @@ struct Hud;
 #[derive(Component)]
 struct Slot;
 
-fn handle_hover_and_click(interaction: Query<(&Interaction, &Children), (Changed<Interaction>, With<Slot>)>, mut hotbar_texture: Query<&mut UiTextureAtlasImage>) {
+fn handle_hover_and_click(interaction: Query<(&Interaction, &Children), (Changed<Interaction>, With<Slot>)>, mut hotbar_texture: Query<&mut UiTextureAtlasImage>, sounds: Res<GameSounds>, audio: Res<AudioChannel<UIChannel>>) {
     for (interaction, children) in interaction.iter() {
         let mut hotbar_texture = hotbar_texture.get_mut(children[0]).unwrap();
         match *interaction {
-            Interaction::Hovered => {
-                hotbar_texture.index = 1;
-            },
             Interaction::Pressed => {
                 hotbar_texture.index = 2;
+                audio.play(sounds.ui_click.clone());
+            },
+            Interaction::Hovered => {
+                hotbar_texture.index = 1;
+                audio.play(sounds.ui_hover.clone());
             },
             Interaction::None => {
                 hotbar_texture.index = 0;

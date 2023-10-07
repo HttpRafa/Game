@@ -5,7 +5,7 @@ use bevy::prelude::{Commands, Component, Entity, IVec2, NextState, OnEnter, OnEx
 use crate::client::state::GameState;
 use crate::client::state::main_menu::home_screen::HomeScreenPlugin;
 use crate::client::state::main_menu::menu_camera::MenuCameraPlugin;
-use crate::client::texture::GameTextures;
+use crate::client::asset::GameTextures;
 use crate::client::world::{Chunk, spawn_chunk, world_to_chunk_position};
 
 mod menu_camera;

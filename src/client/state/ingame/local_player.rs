@@ -8,7 +8,7 @@ use bevy_inspector_egui::prelude::ReflectInspectorOptions;
 use crate::client::animation::{Animation, AnimationFrame, Animations, Animator, calc_animation_index};
 use crate::client::state::GameState;
 use crate::client::state::ingame::remote_player::Player;
-use crate::client::texture::GameTextures;
+use crate::client::asset::GameTextures;
 use crate::client::y_sorting::YSort;
 use crate::common::TILE_SIZE;
 
