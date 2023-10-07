@@ -5,6 +5,7 @@ use crate::client::state::ingame::hud::HudPlugin;
 use crate::client::state::ingame::local_player::LocalPlayerPlugin;
 use crate::client::state::ingame::main_camera::MainCameraPlugin;
 use crate::client::state::ingame::remote_player::RemotePlayerPlugin;
+use crate::client::state::ingame::world::WorldPlugin;
 
 mod world;
 mod remote_player;
@@ -17,6 +18,6 @@ pub struct InGamePlugin;
 
 impl Plugin for InGamePlugin {
     fn build(&self, app: &mut App) {
-        app.add_plugins((MainCameraPlugin, LocalPlayerPlugin, RemotePlayerPlugin, GridCursorPlugin, HudPlugin));
+        app.add_plugins((MainCameraPlugin, WorldPlugin, LocalPlayerPlugin, RemotePlayerPlugin, GridCursorPlugin, HudPlugin));
     }
 }

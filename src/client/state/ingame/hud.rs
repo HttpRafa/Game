@@ -10,14 +10,14 @@ pub struct HudPlugin;
 
 impl Plugin for HudPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(OnEnter(GameState::InGame), setup_ui)
-            .add_systems(OnExit(GameState::InGame), cleanup_ui)
+        app.add_systems(OnEnter(GameState::InGame), setup_hud)
+            .add_systems(OnExit(GameState::InGame), cleanup_hud)
             .add_systems(Update, handle_hover_and_click.run_if(in_state(GameState::InGame)));
     }
 }
 
 #[derive(Component)]
-struct UIRoot;
+struct Hud;
 
 #[derive(Component)]
 struct Slot;
@@ -39,7 +39,7 @@ fn handle_hover_and_click(interaction: Query<(&Interaction, &Children), (Changed
     }
 }
 
-fn setup_ui(mut commands: Commands, textures: Res<GameTextures>) {
+fn setup_hud(mut commands: Commands, textures: Res<GameTextures>) {
     commands.spawn((NodeBundle {
         style: Style {
             position_type: PositionType::Absolute,
@@ -50,7 +50,7 @@ fn setup_ui(mut commands: Commands, textures: Res<GameTextures>) {
             ..default()
         },
         ..default()
-    }, UIRoot, Name::new("UI Root"))).with_children(|commands| {
+    }, Hud, Name::new("Hud"))).with_children(|commands| {
         commands.spawn((NodeBundle {
             style: Style {
                 position_type: PositionType::Absolute,
@@ -86,7 +86,7 @@ fn setup_ui(mut commands: Commands, textures: Res<GameTextures>) {
     });
 }
 
-fn cleanup_ui(mut commands: Commands, roots: Query<Entity, With<UIRoot>>) {
+fn cleanup_hud(mut commands: Commands, roots: Query<Entity, With<Hud>>) {
     for root in &roots {
         commands.entity(root).despawn_recursive();
     }
