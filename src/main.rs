@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use crate::client::ClientPlugin;
 
 mod client;
-mod common;
+mod registry;
 
 fn main() {
     App::new()

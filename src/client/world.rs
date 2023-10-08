@@ -6,7 +6,7 @@ use bevy_inspector_egui::prelude::ReflectInspectorOptions;
 use rand::{Rng, thread_rng};
 use crate::client::asset::{GameTextures, WORLD_GROUND_TILES};
 use crate::client::y_sorting::YSort;
-use crate::common::{CHUNK_SIZE, TILE_SIZE};
+use crate::registry::chunk_data::{CHUNK_SIZE, TILE_SIZE};
 
 #[derive(Component, InspectorOptions, Default, Reflect)]
 #[reflect(Component, InspectorOptions)]

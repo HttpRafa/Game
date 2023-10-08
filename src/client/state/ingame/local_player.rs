@@ -4,13 +4,14 @@ use bevy::app::App;
 use bevy::prelude::*;
 use bevy_inspector_egui::InspectorOptions;
 use bevy_inspector_egui::prelude::ReflectInspectorOptions;
+use bevy_rapier2d::prelude::{Collider, RigidBody, Velocity};
 
 use crate::client::animation::{Animation, AnimationFrame, Animations, Animator, calc_animation_index};
+use crate::client::asset::GameTextures;
 use crate::client::state::GameState;
 use crate::client::state::ingame::remote_player::Player;
-use crate::client::asset::GameTextures;
 use crate::client::y_sorting::YSort;
-use crate::common::TILE_SIZE;
+use crate::registry::chunk_data::TILE_SIZE;
 
 pub struct LocalPlayerPlugin;
 
@@ -35,6 +36,9 @@ pub struct LocalPlayer {
 struct LocalPlayerBundle {
     y_sort: YSort,
     sprite_bundle: SpriteSheetBundle,
+    rigid_body: RigidBody,
+    collider: Collider,
+    velocity: Velocity,
     local_player: LocalPlayer,
     player: Player,
     animator: Animator,
@@ -54,6 +58,9 @@ fn setup_player(mut commands: Commands, textures: Res<GameTextures>) {
             texture_atlas: textures.player_idle.clone(),
             ..default()
         },
+        rigid_body: RigidBody::Dynamic,
+        collider: Collider::capsule_y(TILE_SIZE.x / 2.0, TILE_SIZE.y / 2.0),
+        velocity: Velocity::zero(),
         local_player: LocalPlayer {
             speed: 40.0,
             direction: Default::default(),
@@ -109,16 +116,16 @@ fn gen_animation(texture: &Handle<TextureAtlas>, row: usize, colum_amount: usize
     }
 }
 
-fn player_movement(mut characters: Query<(&mut Transform, &mut Animator, &mut LocalPlayer)>, keyboard_input: Res<Input<KeyCode>>, gamepads: Res<Gamepads>, gamepad_axes: Res<Axis<GamepadAxis>>, time: Res<Time>) {
-    let (mut transform, mut animator, mut player) = characters.single_mut();
-    let mut movement = Vec3::new(0.0, 0.0, 0.0);
+fn player_movement(mut characters: Query<(&mut Velocity, &mut Animator, &mut LocalPlayer)>, keyboard_input: Res<Input<KeyCode>>, gamepads: Res<Gamepads>, gamepad_axes: Res<Axis<GamepadAxis>>) {
+    let (mut velocity, mut animator, mut player) = characters.single_mut();
+    let mut movement = Vec2::new(0.0, 0.0);
 
     for gamepad in gamepads.iter() {
         movement.x = gamepad_axes.get(GamepadAxis::new(gamepad, GamepadAxisType::LeftStickX)).unwrap();
         movement.y = gamepad_axes.get(GamepadAxis::new(gamepad, GamepadAxisType::LeftStickY)).unwrap();
     }
 
-    if movement == Vec3::ZERO {
+    if movement == Vec2::ZERO {
         if keyboard_input.any_pressed([KeyCode::W, KeyCode::Up]) {
             movement.y += 1.0;
         }
@@ -137,10 +144,10 @@ fn player_movement(mut characters: Query<(&mut Transform, &mut Animator, &mut Lo
         movement = movement.normalize_or_zero();
     }
 
-    transform.translation += movement * player.speed * time.delta_seconds();
-    player.direction = Vec2::new(movement.x, movement.y).normalize_or_zero();
+    velocity.linvel = movement * player.speed;
+    player.direction = movement;
     
-    if movement == Vec3::ZERO {
+    if movement == Vec2::ZERO {
         // Is standing still
 
         // If not in Idle animation

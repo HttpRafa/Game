@@ -1,6 +1,6 @@
 use bevy::app::App;
 use bevy::prelude::{Assets, AssetServer, Commands, Handle, Image, info, Plugin, PreStartup, Res, ResMut, Resource, TextureAtlas, Vec2};
-use bevy_kira_audio::{AudioApp, AudioSource};
+use bevy_kira_audio::{AudioApp, AudioChannel, AudioControl, AudioSource};
 
 const VEC_16: Vec2 = Vec2::new(16.0, 16.0);
 const VEC_10: Vec2 = Vec2::new(10.0, 10.0);
@@ -17,7 +17,7 @@ impl Plugin for GameAssetPlugin {
         app.add_audio_channel::<BackgroundChannel>()
             .add_audio_channel::<UIChannel>()
             .add_audio_channel::<SoundEffectsChannel>()
-            .add_systems(PreStartup, load_assets);
+            .add_systems(PreStartup, (load_assets, init_audio_channels));
     }
 }
 
@@ -34,6 +34,12 @@ fn load_assets(mut commands: Commands, asset_server: Res<AssetServer>, mut textu
         ui_click: asset_server.load("audio/ui/click.ogg"),
         ui_hover: asset_server.load("audio/ui/hover.ogg")
     });
+}
+
+fn init_audio_channels(background_channel: Res<AudioChannel<BackgroundChannel>>, ui_channel: Res<AudioChannel<UIChannel>>, fx_channel: Res<AudioChannel<SoundEffectsChannel>>) {
+    background_channel.set_volume(0.1);
+    ui_channel.set_volume(0.1);
+    fx_channel.set_volume(0.1);
 }
 
 #[derive(Resource)]

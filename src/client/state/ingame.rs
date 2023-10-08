@@ -13,6 +13,7 @@ mod local_player;
 mod hud;
 mod grid_cursor;
 mod main_camera;
+mod inventory;
 
 pub struct InGamePlugin;
 

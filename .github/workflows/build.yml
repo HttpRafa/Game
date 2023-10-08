@@ -34,7 +34,7 @@ jobs:
         if: matrix.target == 'x86_64-unknown-linux-gnu'
         uses: actions/upload-artifact@v3
         with:
-          name: distribution-linux
+          name: linux
           path: |
             assets/
             game
@@ -42,7 +42,7 @@ jobs:
         if: matrix.target == 'x86_64-pc-windows-gnu'
         uses: actions/upload-artifact@v3
         with:
-          name: distribution-windows
+          name: windows
           path: |
             assets/
             game.exe

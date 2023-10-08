@@ -9,7 +9,7 @@ use crate::client::state::GameState;
 use crate::client::state::ingame::local_player::LocalPlayer;
 use crate::client::asset::GameTextures;
 use crate::client::world::{Chunk, spawn_chunk, world_to_chunk_position};
-use crate::common::{CHUNK_LOAD_SIZE, CHUNK_SIZE, RENDER_CHUNK_SIZE, TILE_SIZE};
+use crate::registry::chunk_data::{CHUNK_LOAD_SIZE, CHUNK_SIZE, RENDER_CHUNK_SIZE, TILE_SIZE};
 
 pub struct WorldPlugin;
 

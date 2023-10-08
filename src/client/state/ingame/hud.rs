@@ -67,7 +67,7 @@ fn setup_hud(mut commands: Commands, textures: Res<GameTextures>) {
             for x in 0..10 {
                 commands.spawn((ButtonBundle {
                     style: Style {
-                        height: Val::Percent(90.0),
+                        height: Val::Percent(80.0),
                         margin: UiRect::new(
                             Val::Px(2.5),
                             Val::Px(2.5),

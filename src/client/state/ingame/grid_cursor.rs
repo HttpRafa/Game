@@ -7,7 +7,7 @@ use bevy_inspector_egui::prelude::ReflectInspectorOptions;
 use crate::client::camera::MainCamera;
 use crate::client::state::GameState;
 use crate::client::y_sorting::YSort;
-use crate::common::TILE_SIZE;
+use crate::registry::chunk_data::TILE_SIZE;
 
 pub struct GridCursorPlugin;
 
