@@ -1,4 +1,3 @@
-use std::fs;
 use std::time::Duration;
 
 use bevy::app::App;
@@ -13,15 +12,15 @@ use bevy_rapier2d::prelude::{NoUserData, RapierConfiguration, RapierDebugRenderP
 
 use animation::SpriteAnimationPlugin;
 
-use crate::client::asset::GameAssetPlugin;
+use crate::asset::GameAssetPlugin;
 use crate::client::camera::GameCameraPlugin;
 use crate::client::state::StatePlugin;
 use crate::client::y_sorting::YSortPlugin;
-use crate::registry::items::Items;
+use crate::registry::atlas::TextureAtlasRegistry;
+use crate::registry::items::ItemsRegistry;
 
 mod state;
 mod animation;
-mod asset;
 mod y_sorting;
 mod world;
 mod camera;
@@ -48,11 +47,12 @@ impl Plugin for ClientPlugin {
                 RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(10.0),
                 RapierDebugRenderPlugin::default()
             ))
-            .insert_resource(Items::default())
+            .insert_resource(TextureAtlasRegistry::default())
+            .insert_resource(ItemsRegistry::default())
             //.add_plugins((LogDiagnosticsPlugin::default(), FrameTimeDiagnosticsPlugin::default()))
             .add_plugins(WorldInspectorPlugin::default().run_if(input_toggle_active(false, KeyCode::Escape)))
             .add_plugins((GameAssetPlugin, YSortPlugin, SpriteAnimationPlugin, StatePlugin, GameCameraPlugin)) // Core ingame features
-            .add_systems(Startup, (init_client, configure_physics_engine, load_items));
+            .add_systems(Startup, (init_client, configure_physics_engine));
     }
 }
 
@@ -64,31 +64,13 @@ fn configure_physics_engine(mut rapier_config: ResMut<RapierConfiguration>) {
     rapier_config.gravity = Vec2::ZERO;
 }
 
-fn load_items(mut items: ResMut<Items>) {
-    info!("Loading items...");
-    match fs::read_dir("assets/data/items/") {
-        Ok(files) => {
-            for item in files {
-                let item = item.unwrap();
-                match fs::read_to_string(item.path()) {
-                    Ok(content) => {
-                        match toml::from_str(&content) {
-                            Ok(item) => {
-                                items.entities.push(item);
-                            },
-                            Err(error) => {
-                                error!("Failed to parse item file: {} caused by {}", item.path().display(), error);
-                            }
-                        }
-                    }
-                    Err(error) => {
-                        error!("Failed to read item file: {} caused by {}", item.path().display(), error);
-                    }
-                }
-            }
-        }
-        Err(_) => {
-            error!("Failed to read items directory");
-        }
+mod items {
+    use serde::Deserialize;
+
+    #[derive(Deserialize)]
+    struct RawItem {
+        /*stack_size: u8,
+        texture_atlas: String,
+        texture_index: usize*/
     }
 }

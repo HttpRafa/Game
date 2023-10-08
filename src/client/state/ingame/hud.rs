@@ -4,8 +4,8 @@ use bevy::prelude::*;
 use bevy::ui::PositionType;
 use bevy::utils::default;
 use bevy_kira_audio::{AudioChannel, AudioControl};
+use crate::asset::{GameSounds, GameTextures, UIChannel};
 use crate::client::state::GameState;
-use crate::client::asset::{GameSounds, GameTextures, UIChannel};
 
 pub struct HudPlugin;
 
@@ -80,7 +80,7 @@ fn setup_hud(mut commands: Commands, textures: Res<GameTextures>) {
                     ..default()
                 }, Name::new(format!("Slot {}", x)), Slot)).with_children(|commands| {
                     commands.spawn(AtlasImageBundle {
-                        texture_atlas: textures.ui_inventory.clone(),
+                        texture_atlas: textures.ui_inventory.handle.clone(),
                         ..default()
                     });
                 });

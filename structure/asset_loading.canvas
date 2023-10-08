@@ -1,0 +1,15 @@
+{
+	"nodes":[
+		{"id":"765e35f03f5784dc","x":-480,"y":20,"width":250,"height":60,"color":"4","type":"text","text":"PreStartup"},
+		{"id":"e7ba2c8a021c7fa6","x":-140,"y":80,"width":250,"height":60,"color":"2","type":"text","text":"Load Sounds"},
+		{"id":"aee7856f61894eea","x":-140,"y":-40,"width":250,"height":60,"color":"5","type":"text","text":"Load texture atlases"},
+		{"id":"49cdfa99585337d8","x":200,"y":-100,"width":250,"height":60,"color":"2","type":"text","text":"Load items"},
+		{"id":"a26b7bd4b7346e25","x":200,"y":20,"width":250,"height":60,"color":"2","type":"text","text":"Load tiles"}
+	],
+	"edges":[
+		{"id":"6c5f0617996cac24","fromNode":"765e35f03f5784dc","fromSide":"right","toNode":"e7ba2c8a021c7fa6","toSide":"left"},
+		{"id":"67b94f9b63280718","fromNode":"765e35f03f5784dc","fromSide":"right","toNode":"aee7856f61894eea","toSide":"left"},
+		{"id":"7821ab9be330b330","fromNode":"aee7856f61894eea","fromSide":"right","toNode":"49cdfa99585337d8","toSide":"left"},
+		{"id":"7c18faa1d762f8c6","fromNode":"aee7856f61894eea","fromSide":"right","toNode":"a26b7bd4b7346e25","toSide":"left"}
+	]
+}

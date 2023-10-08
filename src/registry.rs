@@ -1,17 +1,28 @@
 pub mod items {
     use bevy::prelude::Resource;
-    use serde::Deserialize;
+    use bevy::utils::HashMap;
 
     #[derive(Resource, Default)]
-    pub struct Items {
-        pub entities: Vec<Item>
+    pub struct ItemsRegistry {
+        pub entities: HashMap<String, Item>
     }
 
-    #[derive(Deserialize)]
     pub struct Item {
-        identifier: String,
-        stack_size: u8,
-        texture_index: usize
+        /*stack_size: u8,
+        texture_atlas: String,
+        texture_index: usize*/
+    }
+}
+
+pub mod atlas {
+    use bevy::prelude::Resource;
+    use bevy::utils::HashMap;
+
+    use crate::asset::GameAtlas;
+
+    #[derive(Resource, Default)]
+    pub struct TextureAtlasRegistry {
+        pub entities: HashMap<String, GameAtlas>
     }
 }
 

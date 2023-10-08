@@ -4,7 +4,7 @@ use bevy_ecs_tilemap::TilemapBundle;
 use bevy_inspector_egui::InspectorOptions;
 use bevy_inspector_egui::prelude::ReflectInspectorOptions;
 use rand::{Rng, thread_rng};
-use crate::client::asset::{GameTextures, WORLD_GROUND_TILES};
+use crate::asset::GameTextures;
 use crate::client::y_sorting::YSort;
 use crate::registry::chunk_data::{CHUNK_SIZE, TILE_SIZE};
 
@@ -31,7 +31,7 @@ pub fn spawn_chunk(chunk_pos: IVec2, chunk: Chunk, commands: &mut Commands, text
             let tile_entity = commands.spawn(TileBundle {
                 position: tile_pos,
                 tilemap_id: TilemapId(tilemap_entity),
-                texture_index: TileTextureIndex(thread_rng().gen_range(0..(WORLD_GROUND_TILES.columns * WORLD_GROUND_TILES.rows) as u32)),
+                texture_index: TileTextureIndex(thread_rng().gen_range(0..(textures.world_ground_tiles.columns * textures.world_ground_tiles.rows) as u32)),
                 ..default()
             }).id();
             commands.entity(tilemap_entity).add_child(tile_entity);
@@ -48,7 +48,7 @@ pub fn spawn_chunk(chunk_pos: IVec2, chunk: Chunk, commands: &mut Commands, text
         grid_size: TILE_SIZE.into(),
         size: CHUNK_SIZE.into(),
         storage: tile_storage,
-        texture: TilemapTexture::Single(textures.world_ground_tiles.clone()),
+        texture: TilemapTexture::Single(textures.world_ground_tiles.handle.clone()),
         tile_size: TILE_SIZE,
         transform,
         ..default()

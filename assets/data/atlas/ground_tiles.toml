@@ -1,0 +1,5 @@
+texture = "texture/atlas/ground_tiles.png"
+tile_size_x = 10
+tile_size_y = 10
+columns = 5
+rows = 3

@@ -5,9 +5,9 @@ use bevy::prelude::*;
 use bevy_inspector_egui::InspectorOptions;
 use bevy_inspector_egui::prelude::ReflectInspectorOptions;
 use bevy_rapier2d::prelude::{Collider, RigidBody, Velocity};
+use crate::asset::GameTextures;
 
 use crate::client::animation::{Animation, AnimationFrame, Animations, Animator, calc_animation_index};
-use crate::client::asset::GameTextures;
 use crate::client::state::GameState;
 use crate::client::state::ingame::remote_player::Player;
 use crate::client::y_sorting::YSort;
@@ -55,7 +55,7 @@ fn setup_player(mut commands: Commands, textures: Res<GameTextures>) {
                 custom_size: Some(Vec2::new(TILE_SIZE.x * 1.5, TILE_SIZE.y * 1.5)),
                 ..default()
             },
-            texture_atlas: textures.player_idle.clone(),
+            texture_atlas: textures.player_animations.handle.clone(),
             ..default()
         },
         rigid_body: RigidBody::Dynamic,
@@ -70,23 +70,23 @@ fn setup_player(mut commands: Commands, textures: Res<GameTextures>) {
         animations: Animations {
             animations: vec![
                 // Idle animation
-                gen_animation(&textures.player_idle, 0, 2, 0.55),
+                gen_animation(&textures.player_animations.handle, 0, 2, 0.55),
                 // Walk right animation
-                gen_animation(&textures.player_walking, 0, 3, 0.25),
+                gen_animation(&textures.player_animations.handle, 1, 3, 0.25),
                 // Walk left animation
-                gen_animation(&textures.player_walking, 1, 3, 0.25),
+                gen_animation(&textures.player_animations.handle, 2, 3, 0.25),
                 // Walk up animation
-                gen_animation(&textures.player_walking, 2, 3, 0.25),
+                gen_animation(&textures.player_animations.handle, 3, 3, 0.25),
                 // Walk down animation
-                gen_animation(&textures.player_walking, 3, 3, 0.25),
+                gen_animation(&textures.player_animations.handle, 4, 3, 0.25),
                 // Walk up right animation
-                gen_animation(&textures.player_walking, 4, 3, 0.25),
+                gen_animation(&textures.player_animations.handle, 5, 3, 0.25),
                 // Walk up left animation
-                gen_animation(&textures.player_walking, 5, 3, 0.25),
+                gen_animation(&textures.player_animations.handle, 6, 3, 0.25),
                 // Walk down right animation
-                gen_animation(&textures.player_walking, 6, 3, 0.25),
+                gen_animation(&textures.player_animations.handle, 7, 3, 0.25),
                 // Walk down left animation
-                gen_animation(&textures.player_walking, 7, 3, 0.25),
+                gen_animation(&textures.player_animations.handle, 8, 3, 0.25),
             ]
         },
         name: Name::new("LocalPlayer"),
