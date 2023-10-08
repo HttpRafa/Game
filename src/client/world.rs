@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use bevy_ecs_tilemap::prelude::{TileBundle, TilemapId, TilemapTexture, TilePos, TileStorage, TileTextureIndex};
+use bevy_ecs_tilemap::prelude::{TileBundle, TileColor, TilemapId, TilemapTexture, TilePos, TileStorage, TileTextureIndex};
 use bevy_ecs_tilemap::TilemapBundle;
 use bevy_inspector_egui::InspectorOptions;
 use bevy_inspector_egui::prelude::ReflectInspectorOptions;
@@ -23,6 +23,8 @@ pub fn world_to_chunk_position(camera_position: &Vec2) -> IVec2 {
 }
 
 pub fn spawn_chunk(chunk_pos: IVec2, chunk: Chunk, commands: &mut Commands, textures: &GameTextures) -> Entity {
+    let debug_color = Color::rgb(thread_rng().gen_range(0.0..1.0), thread_rng().gen_range(0.0..1.0), thread_rng().gen_range(0.0..1.0));
+
     let tilemap_entity = commands.spawn((chunk, Name::new(format!("Chunk {} {}", chunk_pos.x, chunk_pos.y)))).id();
     let mut tile_storage = TileStorage::empty(CHUNK_SIZE.into());
     for x in 0..CHUNK_SIZE.x {
@@ -32,6 +34,7 @@ pub fn spawn_chunk(chunk_pos: IVec2, chunk: Chunk, commands: &mut Commands, text
                 position: tile_pos,
                 tilemap_id: TilemapId(tilemap_entity),
                 texture_index: TileTextureIndex(thread_rng().gen_range(0..(textures.world_ground_tiles.columns * textures.world_ground_tiles.rows) as u32)),
+                color: TileColor(debug_color),
                 ..default()
             }).id();
             commands.entity(tilemap_entity).add_child(tile_entity);
