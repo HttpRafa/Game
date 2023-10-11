@@ -11,7 +11,7 @@ pub mod items {
     }
 
     #[derive(Resource, Default)]
-    pub struct ItemsRegistry {
+    pub struct ItemRegistry {
         pub entities: HashMap<String, Item>
     }
 }

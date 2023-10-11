@@ -17,7 +17,8 @@ use crate::client::camera::GameCameraPlugin;
 use crate::client::state::StatePlugin;
 use crate::client::y_sorting::YSortPlugin;
 use crate::registry::atlas::TextureAtlasRegistry;
-use crate::registry::items::ItemsRegistry;
+use crate::registry::chunk_data::TILE_SIZE;
+use crate::registry::items::ItemRegistry;
 
 mod state;
 mod animation;
@@ -44,11 +45,11 @@ impl Plugin for ClientPlugin {
                     ..default()
                 })
                 .build(), AudioPlugin,
-                RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(10.0),
+                RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(TILE_SIZE.x),
                 RapierDebugRenderPlugin::default()
             ))
             .insert_resource(TextureAtlasRegistry::default())
-            .insert_resource(ItemsRegistry::default())
+            .insert_resource(ItemRegistry::default())
             //.add_plugins((LogDiagnosticsPlugin::default(), FrameTimeDiagnosticsPlugin::default()))
             .add_plugins(WorldInspectorPlugin::default().run_if(input_toggle_active(false, KeyCode::Escape)))
             .add_plugins((GameAssetPlugin, YSortPlugin, SpriteAnimationPlugin, StatePlugin, GameCameraPlugin)) // Core ingame features
