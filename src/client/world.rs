@@ -51,7 +51,7 @@ pub fn spawn_chunk(chunk_pos: IVec2, chunk: Chunk, commands: &mut Commands, text
         grid_size: TILE_SIZE.into(),
         size: CHUNK_SIZE.into(),
         storage: tile_storage,
-        texture: TilemapTexture::Single(textures.world_ground_tiles.handle.clone()),
+        texture: TilemapTexture::Single(textures.world_ground_tiles.image_handle.clone()),
         tile_size: TILE_SIZE,
         transform,
         ..default()

@@ -1,12 +1,16 @@
 pub mod items {
-    use bevy::prelude::{Resource, TextureAtlas};
+    use bevy::prelude::{Reflect, Resource};
     use bevy::utils::HashMap;
+    use bevy_inspector_egui::InspectorOptions;
+    use bevy_inspector_egui::prelude::ReflectInspectorOptions;
 
-    use crate::registry::atlas::LoadedAtlas;
+    use crate::registry::atlas::GameAtlas;
 
+    #[derive(InspectorOptions, Default, Reflect)]
+    #[reflect(InspectorOptions)]
     pub struct Item {
         pub stack_size: u8,
-        pub texture_atlas: LoadedAtlas<TextureAtlas>,
+        pub texture_atlas: GameAtlas,
         pub texture_index: usize
     }
 
@@ -17,33 +21,40 @@ pub mod items {
 }
 
 pub mod atlas {
-    use bevy::asset::Asset;
-    use bevy::prelude::{Handle, Image, Resource, TextureAtlas};
+    use bevy::prelude::{Handle, Image, Reflect, Resource, TextureAtlas};
     use bevy::utils::HashMap;
-    use serde::Deserialize;
+    use bevy_inspector_egui::InspectorOptions;
+    use bevy_inspector_egui::prelude::ReflectInspectorOptions;
 
     #[derive(Resource)]
     pub struct GameTextures {
-        pub player_animations: LoadedAtlas<TextureAtlas>,
-        pub ui_inventory: LoadedAtlas<TextureAtlas>,
-        pub world_ground_tiles: LoadedAtlas<Image>
+        pub player_animations: GameAtlas,
+        pub ui_inventory: GameAtlas,
+        pub world_ground_tiles: GameAtlas
     }
 
-    pub struct LoadedAtlas<T: Asset> {
-        pub tile_size_x: f32,
-        pub tile_size_y: f32,
-        pub columns: usize,
-        pub rows: usize,
-        pub handle: Handle<T>
-    }
-
-    #[derive(Deserialize)]
+    #[derive(InspectorOptions, Default, Reflect)]
+    #[reflect(InspectorOptions)]
     pub struct GameAtlas {
-        pub texture: String,
         pub tile_size_x: f32,
         pub tile_size_y: f32,
         pub columns: usize,
         pub rows: usize,
+        pub image_handle: Handle<Image>,
+        pub atlas_handle: Handle<TextureAtlas>
+    }
+
+    impl Clone for GameAtlas {
+        fn clone(&self) -> Self {
+            Self {
+                tile_size_x: self.tile_size_x,
+                tile_size_y: self.tile_size_y,
+                columns: self.columns,
+                rows: self.rows,
+                image_handle: self.image_handle.clone(),
+                atlas_handle: self.atlas_handle.clone(),
+            }
+        }
     }
 
     #[derive(Resource, Default)]

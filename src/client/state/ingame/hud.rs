@@ -3,8 +3,12 @@ use bevy::core::Name;
 use bevy::prelude::*;
 use bevy::ui::PositionType;
 use bevy::utils::default;
+use bevy_inspector_egui::InspectorOptions;
+use bevy_inspector_egui::prelude::ReflectInspectorOptions;
 use bevy_kira_audio::{AudioChannel, AudioControl};
+
 use crate::client::state::GameState;
+use crate::client::state::ingame::inventory::ItemStack;
 use crate::registry::atlas::GameTextures;
 use crate::registry::audio::{GameSounds, UIChannel};
 
@@ -14,15 +18,40 @@ impl Plugin for HudPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(OnEnter(GameState::InGame), setup_hud)
             .add_systems(OnExit(GameState::InGame), cleanup_hud)
-            .add_systems(Update, handle_hover_and_click.run_if(in_state(GameState::InGame)));
+            .add_systems(Update, update_items.run_if(in_state(GameState::InGame)))
+            .add_systems(Update, handle_hover_and_click.run_if(in_state(GameState::InGame)))
+            .register_type::<Slot>();
     }
 }
 
 #[derive(Component)]
 struct Hud;
 
+#[derive(Component, InspectorOptions, Default, Reflect)]
+#[reflect(Component, InspectorOptions)]
+struct Slot {
+    item_stack: Option<ItemStack>
+}
+
 #[derive(Component)]
-struct Slot;
+struct ItemTexture;
+
+fn update_items(slots: Query<(&Slot, &Children), Changed<Slot>>, mut slot_texture: Query<(&mut Visibility, &mut Handle<TextureAtlas>, &mut UiTextureAtlasImage), With<ItemTexture>>) {
+    for (slot, children) in slots.iter() {
+        let (mut visibility, mut slot_texture, mut image) = slot_texture.get_mut(children[1]).unwrap();
+        match &slot.item_stack {
+            Some(item) => {
+                let item = &item.item;
+                image.index = item.texture_index;
+                *slot_texture = item.texture_atlas.atlas_handle.clone_weak();
+                *visibility = Visibility::Visible;
+            }
+            None => {
+                *visibility = Visibility::Hidden;
+            }
+        }
+    }
+}
 
 fn handle_hover_and_click(interaction: Query<(&Interaction, &Children), (Changed<Interaction>, With<Slot>)>, mut hotbar_texture: Query<&mut UiTextureAtlasImage>, sounds: Res<GameSounds>, audio: Res<AudioChannel<UIChannel>>) {
     for (interaction, children) in interaction.iter() {
@@ -78,11 +107,14 @@ fn setup_hud(mut commands: Commands, textures: Res<GameTextures>) {
                         ..default()
                     },
                     ..default()
-                }, Name::new(format!("Slot {}", x)), Slot)).with_children(|commands| {
+                }, Name::new(format!("Slot {}", x)), Slot {
+                    item_stack: None
+                })).with_children(|commands| {
                     commands.spawn(AtlasImageBundle {
-                        texture_atlas: textures.ui_inventory.handle.clone(),
+                        texture_atlas: textures.ui_inventory.atlas_handle.clone(),
                         ..default()
                     });
+                    commands.spawn((AtlasImageBundle::default(), ItemTexture));
                 });
             }
         });
