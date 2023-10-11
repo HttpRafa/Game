@@ -3,10 +3,10 @@ use bevy::core::Name;
 use bevy::prelude::{AlignItems, BackgroundColor, BuildChildren, Button, ButtonBundle, Changed, Color, Commands, Component, DespawnRecursiveExt, Entity, in_state, Interaction, IntoSystemConfigs, JustifyContent, NextState, NodeBundle, OnEnter, OnExit, Plugin, Query, Res, ResMut, Style, TextBundle, TextStyle, Update, Val, With};
 use bevy::utils::default;
 use bevy_kira_audio::{AudioChannel, AudioControl};
-use crate::asset::{GameSounds, UIChannel};
 
 use crate::client::state::GameState;
 use crate::client::state::main_menu::MainMenuState;
+use crate::registry::audio::{GameSounds, UIChannel};
 
 pub struct HomeScreenPlugin;
 

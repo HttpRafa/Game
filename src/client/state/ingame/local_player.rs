@@ -5,12 +5,12 @@ use bevy::prelude::*;
 use bevy_inspector_egui::InspectorOptions;
 use bevy_inspector_egui::prelude::ReflectInspectorOptions;
 use bevy_rapier2d::prelude::{Collider, RigidBody, Velocity};
-use crate::asset::GameTextures;
 
 use crate::client::animation::{Animation, AnimationFrame, Animations, Animator, calc_animation_index};
 use crate::client::state::GameState;
 use crate::client::state::ingame::remote_player::Player;
 use crate::client::y_sorting::YSort;
+use crate::registry::atlas::GameTextures;
 use crate::registry::chunk_data::TILE_SIZE;
 
 pub struct LocalPlayerPlugin;

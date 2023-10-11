@@ -1,73 +1,74 @@
 use std::fs;
 
 use bevy::app::App;
-use bevy::asset::Asset;
-use bevy::prelude::{error, Handle, Image, info, Plugin, Resource, TextureAtlas};
+use bevy::prelude::{Assets, AssetServer, error, Handle, Image, info, Plugin, Res, ResMut, TextureAtlas, Vec2};
 use bevy::utils::HashMap;
-use bevy_kira_audio::AudioSource;
 use serde::de::DeserializeOwned;
-use serde::Deserialize;
 
-use crate::asset::audio::GameAssetAudioPlugin;
-use crate::asset::textures::GameAssetTexturePlugin;
+use crate::asset::audio::AudioPlugin;
+use crate::asset::items::ItemsPlugin;
+use crate::asset::textures::TexturesPlugin;
+use crate::registry::atlas::{GameAtlas, LoadedAtlas};
 
 pub struct GameAssetPlugin;
 
 impl Plugin for GameAssetPlugin {
     fn build(&self, app: &mut App) {
-        app.add_plugins((GameAssetAudioPlugin, GameAssetTexturePlugin));
+        app.add_plugins((AudioPlugin, TexturesPlugin, ItemsPlugin));
     }
 }
 
-#[derive(Resource)]
-pub struct BackgroundChannel;
+mod items {
+    use bevy::app::App;
+    use bevy::prelude::{Assets, AssetServer, info, Plugin, Res, ResMut, Startup, TextureAtlas};
+    use bevy::utils::HashMap;
+    use serde::Deserialize;
 
-#[derive(Resource)]
-pub struct UIChannel;
+    use crate::asset::load_instances_from_file;
+    use crate::registry::atlas::TextureAtlasRegistry;
+    use crate::registry::items::{Item, ItemsRegistry};
 
-#[derive(Resource)]
-pub struct SoundEffectsChannel;
+    pub struct ItemsPlugin;
 
-#[derive(Resource)]
-pub struct GameSounds {
-    pub ui_click: Handle<AudioSource>,
-    pub ui_hover: Handle<AudioSource>,
-}
+    impl Plugin for ItemsPlugin {
+        fn build(&self, app: &mut App) {
+            app.add_systems(Startup, load_items);
+        }
+    }
 
-#[derive(Resource)]
-pub struct GameTextures {
-    pub player_animations: LoadedAtlas<TextureAtlas>,
-    pub ui_inventory: LoadedAtlas<TextureAtlas>,
-    pub world_ground_tiles: LoadedAtlas<Image>
-}
+    #[derive(Deserialize)]
+    struct RawItem {
+        stack_size: u8,
+        texture_atlas: String,
+        texture_index: usize
+    }
 
-pub struct LoadedAtlas<T: Asset> {
-    pub tile_size_x: f32,
-    pub tile_size_y: f32,
-    pub columns: usize,
-    pub rows: usize,
-    pub handle: Handle<T>
-}
-
-#[derive(Deserialize)]
-pub struct GameAtlas {
-    pub texture: String,
-    pub tile_size_x: f32,
-    pub tile_size_y: f32,
-    pub columns: usize,
-    pub rows: usize,
+    fn load_items(mut registry: ResMut<ItemsRegistry>, atlases: Res<TextureAtlasRegistry>, mut texture_atlases: ResMut<Assets<TextureAtlas>>, asset_server: Res<AssetServer>) {
+        let atlases = &atlases.entities;
+        info!("Loading items...");
+        let mut raw_items: HashMap<String, RawItem> = HashMap::new();
+        load_instances_from_file("assets/data/items/", &mut raw_items);
+        for (identifier, item) in raw_items {
+            info!("Loading item {}", identifier);
+            registry.entities.insert(identifier, Item {
+                stack_size: item.stack_size,
+                texture_atlas: atlases[&item.texture_atlas].create_atlas_loaded(&asset_server, &mut texture_atlases),
+                texture_index: item.texture_index,
+            });
+        }
+    }
 }
 
 mod textures {
     use bevy::app::App;
-    use bevy::prelude::{Assets, AssetServer, Commands, Handle, Image, info, Plugin, PreStartup, Res, ResMut, Startup, TextureAtlas, Vec2};
+    use bevy::prelude::{Assets, AssetServer, Commands, info, Plugin, PreStartup, Res, ResMut, Startup, TextureAtlas};
 
-    use crate::asset::{GameAtlas, GameTextures, load_instances_from_file, LoadedAtlas};
-    use crate::registry::atlas::TextureAtlasRegistry;
+    use crate::asset::load_instances_from_file;
+    use crate::registry::atlas::{GameTextures, TextureAtlasRegistry};
 
-    pub struct GameAssetTexturePlugin;
+    pub struct TexturesPlugin;
 
-    impl Plugin for GameAssetTexturePlugin {
+    impl Plugin for TexturesPlugin {
         fn build(&self, app: &mut App) {
             app.add_systems(PreStartup, load_atlases)
                 .add_systems(Startup, init_textures);
@@ -87,37 +88,6 @@ mod textures {
             world_ground_tiles: registry["ground_tiles"].create_loaded(&asset_server)
         });
     }
-
-    impl GameAtlas {
-        fn create_loaded(&self, asset_server: &Res<AssetServer>) -> LoadedAtlas<Image> {
-            LoadedAtlas {
-                tile_size_x: self.tile_size_x,
-                tile_size_y: self.tile_size_y,
-                columns: self.columns,
-                rows: self.rows,
-                handle: self.create_handle(asset_server),
-            }
-        }
-
-        fn create_atlas_loaded(&self, asset_server: &Res<AssetServer>, texture_atlases: &mut ResMut<Assets<TextureAtlas>>) -> LoadedAtlas<TextureAtlas> {
-            LoadedAtlas {
-                tile_size_x: self.tile_size_x,
-                tile_size_y: self.tile_size_y,
-                columns: self.columns,
-                rows: self.rows,
-                handle: self.create_atlas_handle(asset_server, texture_atlases),
-            }
-        }
-
-        fn create_handle(&self, asset_server: &Res<AssetServer>) -> Handle<Image> {
-            asset_server.load(&self.texture)
-        }
-
-        fn create_atlas_handle(&self, asset_server: &Res<AssetServer>, texture_atlases: &mut ResMut<Assets<TextureAtlas>>) -> Handle<TextureAtlas> {
-            let texture_atlas = TextureAtlas::from_grid(asset_server.load(&self.texture), Vec2::new(self.tile_size_x, self.tile_size_y), self.columns, self.rows, None, None);
-            texture_atlases.add(texture_atlas)
-        }
-    }
 }
 
 mod audio {
@@ -125,11 +95,11 @@ mod audio {
     use bevy::prelude::{AssetServer, Commands, info, Plugin, PreStartup, Res};
     use bevy_kira_audio::{AudioApp, AudioChannel, AudioControl};
 
-    use crate::asset::{BackgroundChannel, GameSounds, SoundEffectsChannel, UIChannel};
+    use crate::registry::audio::{BackgroundChannel, GameSounds, SoundEffectsChannel, UIChannel};
 
-    pub struct GameAssetAudioPlugin;
+    pub struct AudioPlugin;
 
-    impl Plugin for GameAssetAudioPlugin {
+    impl Plugin for AudioPlugin {
         fn build(&self, app: &mut App) {
             app.add_audio_channel::<BackgroundChannel>()
                 .add_audio_channel::<UIChannel>()
@@ -150,6 +120,37 @@ mod audio {
         background_channel.set_volume(0.1);
         ui_channel.set_volume(0.1);
         fx_channel.set_volume(0.1);
+    }
+}
+
+impl GameAtlas {
+    fn create_loaded(&self, asset_server: &Res<AssetServer>) -> LoadedAtlas<Image> {
+        LoadedAtlas {
+            tile_size_x: self.tile_size_x,
+            tile_size_y: self.tile_size_y,
+            columns: self.columns,
+            rows: self.rows,
+            handle: self.create_handle(asset_server),
+        }
+    }
+
+    fn create_atlas_loaded(&self, asset_server: &Res<AssetServer>, texture_atlases: &mut ResMut<Assets<TextureAtlas>>) -> LoadedAtlas<TextureAtlas> {
+        LoadedAtlas {
+            tile_size_x: self.tile_size_x,
+            tile_size_y: self.tile_size_y,
+            columns: self.columns,
+            rows: self.rows,
+            handle: self.create_atlas_handle(asset_server, texture_atlases),
+        }
+    }
+
+    fn create_handle(&self, asset_server: &Res<AssetServer>) -> Handle<Image> {
+        asset_server.load(&self.texture)
+    }
+
+    fn create_atlas_handle(&self, asset_server: &Res<AssetServer>, texture_atlases: &mut ResMut<Assets<TextureAtlas>>) -> Handle<TextureAtlas> {
+        let texture_atlas = TextureAtlas::from_grid(asset_server.load(&self.texture), Vec2::new(self.tile_size_x, self.tile_size_y), self.columns, self.rows, None, None);
+        texture_atlases.add(texture_atlas)
     }
 }
 
@@ -178,7 +179,7 @@ fn load_instances_from_file<T: DeserializeOwned>(path: &str, registry: &mut Hash
             }
         }
         Err(_) => {
-            error!("Failed to read data directory");
+            error!("Failed to read data directory {}", path);
         }
     }
 }

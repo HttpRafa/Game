@@ -4,8 +4,8 @@ use bevy_ecs_tilemap::TilemapBundle;
 use bevy_inspector_egui::InspectorOptions;
 use bevy_inspector_egui::prelude::ReflectInspectorOptions;
 use rand::{Rng, thread_rng};
-use crate::asset::GameTextures;
 use crate::client::y_sorting::YSort;
+use crate::registry::atlas::GameTextures;
 use crate::registry::chunk_data::{CHUNK_SIZE, TILE_SIZE};
 
 #[derive(Component, InspectorOptions, Default, Reflect)]

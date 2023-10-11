@@ -1,12 +1,12 @@
 use bevy::app::App;
 use bevy::math::Vec3Swizzles;
 use bevy::prelude::{Commands, Component, Entity, IVec2, NextState, OnEnter, OnExit, Plugin, Query, Res, ResMut, States, Vec3, With};
-use crate::asset::GameTextures;
 
 use crate::client::state::GameState;
 use crate::client::state::main_menu::home_screen::HomeScreenPlugin;
 use crate::client::state::main_menu::menu_camera::MenuCameraPlugin;
 use crate::client::world::{Chunk, spawn_chunk, world_to_chunk_position};
+use crate::registry::atlas::GameTextures;
 
 mod menu_camera;
 mod home_screen;
