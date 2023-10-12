@@ -156,6 +156,7 @@ fn setup_hud(mut commands: Commands, textures: Res<GameTextures>) {
                                             Val::Px(2.5),
                                             Val::Px(2.5),
                                         ),
+                                        justify_content: JustifyContent::Center,
                                         ..default()
                                     },
                                     ..default()
@@ -168,7 +169,19 @@ fn setup_hud(mut commands: Commands, textures: Res<GameTextures>) {
                                     texture_atlas: textures.ui_inventory.atlas_handle.clone(),
                                     ..default()
                                 });
-                                commands.spawn((AtlasImageBundle::default(), ItemTexture));
+                                commands.spawn((
+                                    AtlasImageBundle {
+                                        style: Style {
+                                            position_type: PositionType::Absolute,
+                                            width: Val::Percent(80.0),
+                                            height: Val::Percent(80.0),
+                                            align_self: AlignSelf::Center,
+                                            ..default()
+                                        },
+                                        ..default()
+                                    },
+                                    ItemTexture,
+                                ));
                             });
                     }
                 });

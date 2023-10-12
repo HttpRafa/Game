@@ -1,5 +1,5 @@
 texture = "texture/atlas/inventory.png"
-tile_size_x = 16
+tile_size_x = 16 
 tile_size_y = 16
 columns = 3
 rows = 1
