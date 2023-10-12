@@ -1,12 +1,10 @@
-use bevy::prelude::*;
 use crate::client::ClientPlugin;
+use bevy::prelude::*;
 
+mod asset;
 mod client;
 mod registry;
-mod asset;
 
 fn main() {
-    App::new()
-        .add_plugins(ClientPlugin)
-        .run();
+    App::new().add_plugins(ClientPlugin).run();
 }

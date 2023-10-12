@@ -1,8 +1,8 @@
 pub mod items {
     use bevy::prelude::{Reflect, Resource};
     use bevy::utils::HashMap;
-    use bevy_inspector_egui::InspectorOptions;
     use bevy_inspector_egui::prelude::ReflectInspectorOptions;
+    use bevy_inspector_egui::InspectorOptions;
 
     use crate::registry::atlas::GameAtlas;
 
@@ -11,26 +11,36 @@ pub mod items {
     pub struct Item {
         pub stack_size: u8,
         pub texture_atlas: GameAtlas,
-        pub texture_index: usize
+        pub texture_index: usize,
+    }
+
+    impl Clone for Item {
+        fn clone(&self) -> Self {
+            Self {
+                stack_size: self.stack_size,
+                texture_atlas: self.texture_atlas.clone_weak(),
+                texture_index: self.texture_index,
+            }
+        }
     }
 
     #[derive(Resource, Default)]
     pub struct ItemRegistry {
-        pub entities: HashMap<String, Item>
+        pub entities: HashMap<String, Item>,
     }
 }
 
 pub mod atlas {
     use bevy::prelude::{Handle, Image, Reflect, Resource, TextureAtlas};
     use bevy::utils::HashMap;
-    use bevy_inspector_egui::InspectorOptions;
     use bevy_inspector_egui::prelude::ReflectInspectorOptions;
+    use bevy_inspector_egui::InspectorOptions;
 
     #[derive(Resource)]
     pub struct GameTextures {
         pub player_animations: GameAtlas,
         pub ui_inventory: GameAtlas,
-        pub world_ground_tiles: GameAtlas
+        pub world_ground_tiles: GameAtlas,
     }
 
     #[derive(InspectorOptions, Default, Reflect)]
@@ -41,7 +51,20 @@ pub mod atlas {
         pub columns: usize,
         pub rows: usize,
         pub image_handle: Handle<Image>,
-        pub atlas_handle: Handle<TextureAtlas>
+        pub atlas_handle: Handle<TextureAtlas>,
+    }
+
+    impl GameAtlas {
+        pub fn clone_weak(&self) -> Self {
+            Self {
+                tile_size_x: self.tile_size_x,
+                tile_size_y: self.tile_size_y,
+                columns: self.columns,
+                rows: self.rows,
+                image_handle: self.image_handle.clone_weak(),
+                atlas_handle: self.atlas_handle.clone_weak(),
+            }
+        }
     }
 
     impl Clone for GameAtlas {
@@ -59,7 +82,7 @@ pub mod atlas {
 
     #[derive(Resource, Default)]
     pub struct TextureAtlasRegistry {
-        pub entities: HashMap<String, GameAtlas>
+        pub entities: HashMap<String, GameAtlas>,
     }
 }
 
@@ -91,10 +114,7 @@ pub mod chunk_data {
     pub const CHUNK_SIZE: UVec2 = UVec2 { x: 10, y: 10 };
     pub const RENDER_CHUNK_SIZE: UVec2 = UVec2 {
         x: CHUNK_SIZE.x * 3,
-        y: CHUNK_SIZE.y * 3
+        y: CHUNK_SIZE.y * 3,
     };
-    pub const CHUNK_LOAD_SIZE: UVec2 = UVec2 {
-        x: 3,
-        y: 3
-    };
+    pub const CHUNK_LOAD_SIZE: UVec2 = UVec2 { x: 3, y: 3 };
 }

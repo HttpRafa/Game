@@ -2,13 +2,15 @@ use std::time::Duration;
 
 use bevy::app::App;
 use bevy::prelude::*;
-use bevy_inspector_egui::InspectorOptions;
 use bevy_inspector_egui::prelude::ReflectInspectorOptions;
+use bevy_inspector_egui::InspectorOptions;
 use bevy_rapier2d::prelude::{Collider, RigidBody, Velocity};
 
-use crate::client::animation::{Animation, AnimationFrame, Animations, Animator, calc_animation_index};
-use crate::client::state::GameState;
+use crate::client::animation::{
+    calc_animation_index, Animation, AnimationFrame, Animations, Animator,
+};
 use crate::client::state::ingame::remote_player::Player;
+use crate::client::state::GameState;
 use crate::client::y_sorting::YSort;
 use crate::registry::atlas::GameTextures;
 use crate::registry::chunk_data::TILE_SIZE;
@@ -43,7 +45,7 @@ struct LocalPlayerBundle {
     player: Player,
     animator: Animator,
     animations: Animations,
-    name: Name
+    name: Name,
 }
 
 fn setup_player(mut commands: Commands, textures: Res<GameTextures>) {
@@ -87,7 +89,7 @@ fn setup_player(mut commands: Commands, textures: Res<GameTextures>) {
                 gen_animation(&textures.player_animations.atlas_handle, 7, 3, 0.25),
                 // Walk down left animation
                 gen_animation(&textures.player_animations.atlas_handle, 8, 3, 0.25),
-            ]
+            ],
         },
         name: Name::new("LocalPlayer"),
     });
@@ -99,7 +101,12 @@ fn cleanup_player(mut commands: Commands, players: Query<Entity, With<LocalPlaye
     }
 }
 
-fn gen_animation(texture: &Handle<TextureAtlas>, row: usize, colum_amount: usize, duration: f32) -> Animation {
+fn gen_animation(
+    texture: &Handle<TextureAtlas>,
+    row: usize,
+    colum_amount: usize,
+    duration: f32,
+) -> Animation {
     let mut frames: Vec<AnimationFrame> = vec![];
 
     for colum in 0..colum_amount {
@@ -111,18 +118,25 @@ fn gen_animation(texture: &Handle<TextureAtlas>, row: usize, colum_amount: usize
         });
     }
 
-    Animation {
-        frames
-    }
+    Animation { frames }
 }
 
-fn player_movement(mut characters: Query<(&mut Velocity, &mut Animator, &mut LocalPlayer)>, keyboard_input: Res<Input<KeyCode>>, gamepads: Res<Gamepads>, gamepad_axes: Res<Axis<GamepadAxis>>) {
+fn player_movement(
+    mut characters: Query<(&mut Velocity, &mut Animator, &mut LocalPlayer)>,
+    keyboard_input: Res<Input<KeyCode>>,
+    gamepads: Res<Gamepads>,
+    gamepad_axes: Res<Axis<GamepadAxis>>,
+) {
     let (mut velocity, mut animator, mut player) = characters.single_mut();
     let mut movement = Vec2::new(0.0, 0.0);
 
     for gamepad in gamepads.iter() {
-        movement.x = gamepad_axes.get(GamepadAxis::new(gamepad, GamepadAxisType::LeftStickX)).unwrap();
-        movement.y = gamepad_axes.get(GamepadAxis::new(gamepad, GamepadAxisType::LeftStickY)).unwrap();
+        movement.x = gamepad_axes
+            .get(GamepadAxis::new(gamepad, GamepadAxisType::LeftStickX))
+            .unwrap();
+        movement.y = gamepad_axes
+            .get(GamepadAxis::new(gamepad, GamepadAxisType::LeftStickY))
+            .unwrap();
     }
 
     if movement == Vec2::ZERO {
@@ -146,7 +160,7 @@ fn player_movement(mut characters: Query<(&mut Velocity, &mut Animator, &mut Loc
 
     velocity.linvel = movement * player.speed;
     player.direction = movement;
-    
+
     if movement == Vec2::ZERO {
         // Is standing still
 
@@ -166,7 +180,6 @@ fn player_movement(mut characters: Query<(&mut Velocity, &mut Animator, &mut Loc
             // If not in walking down animation
             change_animation(4, &mut animator);
         }
-
     } else if movement.x > 0.0 {
         if movement.y == 0.0 {
             // Moving to the right

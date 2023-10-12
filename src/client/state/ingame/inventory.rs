@@ -1,8 +1,8 @@
+use crate::registry::items::Item;
 use bevy::app::App;
 use bevy::prelude::{Plugin, Reflect, Resource};
-use bevy_inspector_egui::InspectorOptions;
 use bevy_inspector_egui::prelude::ReflectInspectorOptions;
-use crate::registry::items::Item;
+use bevy_inspector_egui::InspectorOptions;
 
 pub struct InventoryPlugin;
 
@@ -23,5 +23,5 @@ pub struct PlayerInventory {
 #[reflect(InspectorOptions)]
 pub struct ItemStack {
     pub item: Item,
-    pub amount: u8
+    pub amount: u8,
 }

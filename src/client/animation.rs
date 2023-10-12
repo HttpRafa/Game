@@ -1,12 +1,12 @@
-use std::time::Duration;
 use bevy::app::App;
+use std::time::Duration;
 
 use bevy::asset::Handle;
 use bevy::ecs::prelude::{Component, Query, Res};
 use bevy::prelude::*;
 use bevy::sprite::{TextureAtlas, TextureAtlasSprite};
-use bevy_inspector_egui::InspectorOptions;
 use bevy_inspector_egui::prelude::ReflectInspectorOptions;
+use bevy_inspector_egui::InspectorOptions;
 
 pub struct SpriteAnimationPlugin;
 
@@ -61,7 +61,15 @@ pub fn calc_animation_index(row: usize, colum: usize, row_size: usize) -> usize 
     colum + (row * row_size)
 }
 
-fn animate_sprite(mut query: Query<(&Animations, &mut Animator, &mut Handle<TextureAtlas>, &mut TextureAtlasSprite)>, time: Res<Time>) {
+fn animate_sprite(
+    mut query: Query<(
+        &Animations,
+        &mut Animator,
+        &mut Handle<TextureAtlas>,
+        &mut TextureAtlasSprite,
+    )>,
+    time: Res<Time>,
+) {
     for (animations, mut animator, mut atlas, mut sprite) in &mut query.iter_mut() {
         animator.timer.tick(time.delta());
 

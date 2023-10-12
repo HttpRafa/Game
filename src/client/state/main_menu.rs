@@ -1,15 +1,18 @@
 use bevy::app::App;
 use bevy::math::Vec3Swizzles;
-use bevy::prelude::{Commands, Component, Entity, IVec2, NextState, OnEnter, OnExit, Plugin, Query, Res, ResMut, States, Vec3, With};
+use bevy::prelude::{
+    Commands, Component, Entity, IVec2, NextState, OnEnter, OnExit, Plugin, Query, Res, ResMut,
+    States, Vec3, With,
+};
 
-use crate::client::state::GameState;
 use crate::client::state::main_menu::home_screen::HomeScreenPlugin;
 use crate::client::state::main_menu::menu_camera::MenuCameraPlugin;
-use crate::client::world::{Chunk, spawn_chunk, world_to_chunk_position};
+use crate::client::state::GameState;
+use crate::client::world::{spawn_chunk, world_to_chunk_position, Chunk};
 use crate::registry::atlas::GameTextures;
 
-mod menu_camera;
 mod home_screen;
+mod menu_camera;
 
 pub struct MainMenuPlugin;
 
@@ -26,7 +29,7 @@ impl Plugin for MainMenuPlugin {
 pub enum MainMenuState {
     None,
     #[default]
-    HomeScreen
+    HomeScreen,
 }
 
 #[derive(Component)]
@@ -36,7 +39,11 @@ fn setup_screen(mut commands: Commands, textures: Res<GameTextures>) {
     spawn_empty_chunks(Vec3::ZERO, 2, &mut commands, &textures);
 }
 
-fn cleanup_screen(mut commands: Commands, mut menu_state: ResMut<NextState<MainMenuState>>, chunks: Query<Entity, With<MenuChunk>>) {
+fn cleanup_screen(
+    mut commands: Commands,
+    mut menu_state: ResMut<NextState<MainMenuState>>,
+    chunks: Query<Entity, With<MenuChunk>>,
+) {
     menu_state.set(MainMenuState::None);
 
     for entity in &chunks {
@@ -44,7 +51,12 @@ fn cleanup_screen(mut commands: Commands, mut menu_state: ResMut<NextState<MainM
     }
 }
 
-fn spawn_empty_chunks(world_position: Vec3, radius: i32, mut commands: &mut Commands, textures: &GameTextures) {
+fn spawn_empty_chunks(
+    world_position: Vec3,
+    radius: i32,
+    mut commands: &mut Commands,
+    textures: &GameTextures,
+) {
     let chunk_position = world_to_chunk_position(&world_position.xy());
     for x in (chunk_position.x - radius)..(chunk_position.x + radius) {
         for y in (chunk_position.y - radius)..(chunk_position.y + radius) {

@@ -1,13 +1,16 @@
 use bevy::app::App;
 use bevy::math::Vec3Swizzles;
-use bevy::prelude::{Commands, default, DespawnRecursiveExt, Entity, in_state, IntoSystemConfigs, IVec2, OnExit, Plugin, Query, Res, ResMut, Resource, Transform, Update, With};
+use bevy::prelude::{
+    default, in_state, Commands, DespawnRecursiveExt, Entity, IVec2, IntoSystemConfigs, OnExit,
+    Plugin, Query, Res, ResMut, Resource, Transform, Update, With,
+};
 use bevy::utils::HashSet;
-use bevy_ecs_tilemap::TilemapPlugin;
 use bevy_ecs_tilemap::prelude::TilemapRenderSettings;
+use bevy_ecs_tilemap::TilemapPlugin;
 
-use crate::client::state::GameState;
 use crate::client::state::ingame::local_player::LocalPlayer;
-use crate::client::world::{Chunk, spawn_chunk, world_to_chunk_position};
+use crate::client::state::GameState;
+use crate::client::world::{spawn_chunk, world_to_chunk_position, Chunk};
 use crate::registry::atlas::GameTextures;
 use crate::registry::chunk_data::{CHUNK_LOAD_SIZE, CHUNK_SIZE, RENDER_CHUNK_SIZE, TILE_SIZE};
 
@@ -18,11 +21,15 @@ impl Plugin for WorldPlugin {
         app.insert_resource(TilemapRenderSettings {
             render_chunk_size: RENDER_CHUNK_SIZE,
             ..default()
-        }).add_plugins(TilemapPlugin)
-            .insert_resource(ChunkManager::default())
-            .add_systems(OnExit(GameState::InGame), cleanup_chunks)
-            .add_systems(Update, spawn_chunks_around_player.run_if(in_state(GameState::InGame)))
-            .add_systems(Update, despawn_chunks.run_if(in_state(GameState::InGame)));
+        })
+        .add_plugins(TilemapPlugin)
+        .insert_resource(ChunkManager::default())
+        .add_systems(OnExit(GameState::InGame), cleanup_chunks)
+        .add_systems(
+            Update,
+            spawn_chunks_around_player.run_if(in_state(GameState::InGame)),
+        )
+        .add_systems(Update, despawn_chunks.run_if(in_state(GameState::InGame)));
     }
 }
 
@@ -31,11 +38,20 @@ struct ChunkManager {
     pub spawned_chunks: HashSet<IVec2>,
 }
 
-fn spawn_chunks_around_player(mut commands: Commands, textures: Res<GameTextures>, player_transform: Query<&Transform, With<LocalPlayer>>, mut chunk_manager: ResMut<ChunkManager>) {
+fn spawn_chunks_around_player(
+    mut commands: Commands,
+    textures: Res<GameTextures>,
+    player_transform: Query<&Transform, With<LocalPlayer>>,
+    mut chunk_manager: ResMut<ChunkManager>,
+) {
     let player_transform = player_transform.single();
     let chunk_position = world_to_chunk_position(&player_transform.translation.xy());
-    for x in (chunk_position.x - CHUNK_LOAD_SIZE.x as i32)..(chunk_position.x + CHUNK_LOAD_SIZE.x as i32) {
-        for y in (chunk_position.y - CHUNK_LOAD_SIZE.y as i32)..(chunk_position.y + CHUNK_LOAD_SIZE.y as i32) {
+    for x in
+        (chunk_position.x - CHUNK_LOAD_SIZE.x as i32)..(chunk_position.x + CHUNK_LOAD_SIZE.x as i32)
+    {
+        for y in (chunk_position.y - CHUNK_LOAD_SIZE.y as i32)
+            ..(chunk_position.y + CHUNK_LOAD_SIZE.y as i32)
+        {
             if !chunk_manager.spawned_chunks.contains(&IVec2::new(x, y)) {
                 chunk_manager.spawned_chunks.insert(IVec2::new(x, y));
                 spawn_chunk(IVec2::new(x, y), Chunk::default(), &mut commands, &textures);
@@ -44,7 +60,12 @@ fn spawn_chunks_around_player(mut commands: Commands, textures: Res<GameTextures
     }
 }
 
-fn despawn_chunks(mut commands: Commands, player_transform: Query<&Transform, With<LocalPlayer>>, chunks: Query<(Entity, &Transform), With<Chunk>>, mut chunk_manager: ResMut<ChunkManager>) {
+fn despawn_chunks(
+    mut commands: Commands,
+    player_transform: Query<&Transform, With<LocalPlayer>>,
+    chunks: Query<(Entity, &Transform), With<Chunk>>,
+    mut chunk_manager: ResMut<ChunkManager>,
+) {
     let player_transform = player_transform.single();
     for (entity, chunk_transform) in chunks.iter() {
         let chunk_position = chunk_transform.translation.xy();
@@ -58,7 +79,11 @@ fn despawn_chunks(mut commands: Commands, player_transform: Query<&Transform, Wi
     }
 }
 
-fn cleanup_chunks(mut commands: Commands, chunks: Query<Entity, With<Chunk>>, mut chunk_manager: ResMut<ChunkManager>) {
+fn cleanup_chunks(
+    mut commands: Commands,
+    chunks: Query<Entity, With<Chunk>>,
+    mut chunk_manager: ResMut<ChunkManager>,
+) {
     for chunk in &chunks {
         commands.entity(chunk).despawn_recursive();
     }

@@ -1,10 +1,10 @@
-use bevy::app::App;
-use bevy::prelude::{Plugin, States};
 use crate::client::state::ingame::InGamePlugin;
 use crate::client::state::main_menu::MainMenuPlugin;
+use bevy::app::App;
+use bevy::prelude::{Plugin, States};
 
-mod main_menu;
 mod ingame;
+mod main_menu;
 
 pub struct StatePlugin;
 
@@ -19,5 +19,5 @@ impl Plugin for StatePlugin {
 pub enum GameState {
     #[default]
     MainMenu,
-    InGame
+    InGame,
 }

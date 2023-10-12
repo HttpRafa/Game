@@ -2,13 +2,15 @@ use std::time::Duration;
 
 use bevy::app::App;
 use bevy::asset::ChangeWatcher;
-use bevy::DefaultPlugins;
 use bevy::input::common_conditions::input_toggle_active;
 use bevy::prelude::*;
 use bevy::utils::default;
+use bevy::DefaultPlugins;
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 use bevy_kira_audio::AudioPlugin;
-use bevy_rapier2d::prelude::{NoUserData, RapierConfiguration, RapierDebugRenderPlugin, RapierPhysicsPlugin};
+use bevy_rapier2d::prelude::{
+    NoUserData, RapierConfiguration, RapierDebugRenderPlugin, RapierPhysicsPlugin,
+};
 
 use animation::SpriteAnimationPlugin;
 
@@ -20,18 +22,18 @@ use crate::registry::atlas::TextureAtlasRegistry;
 use crate::registry::chunk_data::TILE_SIZE;
 use crate::registry::items::ItemRegistry;
 
-mod state;
 mod animation;
-mod y_sorting;
-mod world;
 mod camera;
+mod state;
+mod world;
+mod y_sorting;
 
 pub struct ClientPlugin;
 
 impl Plugin for ClientPlugin {
     fn build(&self, app: &mut App) {
-        app
-            .add_plugins((DefaultPlugins
+        app.add_plugins((
+            DefaultPlugins
                 .set(ImagePlugin::default_nearest())
                 .set(WindowPlugin {
                     primary_window: Some(Window {
@@ -44,16 +46,25 @@ impl Plugin for ClientPlugin {
                     watch_for_changes: ChangeWatcher::with_delay(Duration::from_secs(5)),
                     ..default()
                 })
-                .build(), AudioPlugin,
-                RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(TILE_SIZE.x),
-                RapierDebugRenderPlugin::default()
-            ))
-            .insert_resource(TextureAtlasRegistry::default())
-            .insert_resource(ItemRegistry::default())
-            //.add_plugins((LogDiagnosticsPlugin::default(), FrameTimeDiagnosticsPlugin::default()))
-            .add_plugins(WorldInspectorPlugin::default().run_if(input_toggle_active(false, KeyCode::Escape)))
-            .add_plugins((GameAssetPlugin, YSortPlugin, SpriteAnimationPlugin, StatePlugin, GameCameraPlugin)) // Core ingame features
-            .add_systems(Startup, (init_client, configure_physics_engine));
+                .build(),
+            AudioPlugin,
+            RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(TILE_SIZE.x),
+            RapierDebugRenderPlugin::default(),
+        ))
+        .insert_resource(TextureAtlasRegistry::default())
+        .insert_resource(ItemRegistry::default())
+        //.add_plugins((LogDiagnosticsPlugin::default(), FrameTimeDiagnosticsPlugin::default()))
+        .add_plugins(
+            WorldInspectorPlugin::default().run_if(input_toggle_active(false, KeyCode::Escape)),
+        )
+        .add_plugins((
+            GameAssetPlugin,
+            YSortPlugin,
+            SpriteAnimationPlugin,
+            StatePlugin,
+            GameCameraPlugin,
+        )) // Core ingame features
+        .add_systems(Startup, (init_client, configure_physics_engine));
     }
 }
 
