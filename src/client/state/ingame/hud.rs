@@ -4,6 +4,8 @@ use crate::registry::audio::{GameSounds, UIChannel};
 use bevy::prelude::*;
 use bevy::ui::PositionType;
 use bevy::utils::default;
+use bevy_inspector_egui::prelude::ReflectInspectorOptions;
+use bevy_inspector_egui::InspectorOptions;
 use bevy_kira_audio::{AudioChannel, AudioControl};
 use bevy_rapier2d::parry::utils::Array1;
 
@@ -19,15 +21,16 @@ impl Plugin for HudPlugin {
             .add_systems(
                 Update,
                 handle_hover_and_click.run_if(in_state(GameState::InGame)),
-            );
-        // TODO: .register_type::<Slot>();
+            )
+            .register_type::<Slot>();
     }
 }
 
 #[derive(Component)]
 struct Hud;
 
-#[derive(Component)]
+#[derive(Component, InspectorOptions, Default, Reflect)]
+#[reflect(Component, InspectorOptions)]
 struct Slot(usize);
 
 #[derive(Component)]

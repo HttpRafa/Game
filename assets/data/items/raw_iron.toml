@@ -1,0 +1,3 @@
+stack_size = 100
+texture_atlas = "items"
+texture_index = 0
