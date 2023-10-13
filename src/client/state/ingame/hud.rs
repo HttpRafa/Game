@@ -9,7 +9,7 @@ use bevy_inspector_egui::InspectorOptions;
 use bevy_kira_audio::{AudioChannel, AudioControl};
 use bevy_rapier2d::parry::utils::Array1;
 
-use super::inventory::PlayerInventory;
+use super::inventory::player_inventory::PlayerInventory;
 
 pub struct HudPlugin;
 

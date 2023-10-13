@@ -2,7 +2,6 @@ use crate::client::camera::MainCamera;
 use crate::client::state::GameState;
 use crate::client::y_sorting::YSort;
 use crate::registry::chunk_data::TILE_SIZE;
-use crate::registry::items::Item;
 use bevy::app::App;
 use bevy::core::Name;
 use bevy::prelude::*;
@@ -16,16 +15,14 @@ impl Plugin for GridCursorPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(OnEnter(GameState::InGame), setup_cursor)
             .add_systems(OnExit(GameState::InGame), cleanup_cursor)
-            .add_systems(Update, update_cursor.run_if(in_state(GameState::InGame)))
+            //.add_systems(Update, update_cursor.run_if(in_state(GameState::InGame)))
             .add_systems(Update, move_cursor.run_if(in_state(GameState::InGame)));
     }
 }
 
 #[derive(Component, InspectorOptions, Default, Reflect)]
 #[reflect(Component, InspectorOptions)]
-pub struct GridCursor {
-    pub item: Option<Item>,
-}
+pub struct GridCursor;
 
 fn move_cursor(
     mut cursors: Query<&mut Transform, With<GridCursor>>,
@@ -48,7 +45,7 @@ fn move_cursor(
     }
 }
 
-fn update_cursor(
+/*fn update_cursor(
     cursors: Query<(&GridCursor, &Children), Changed<GridCursor>>,
     mut cursor_texture: Query<(
         &mut Visibility,
@@ -70,7 +67,7 @@ fn update_cursor(
             }
         }
     }
-}
+}*/
 
 fn setup_cursor(mut commands: Commands) {
     commands.spawn((
