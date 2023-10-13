@@ -106,6 +106,11 @@ pub mod audio {
     }
 }
 
+pub mod player_data {
+    pub const INVENTORY_SIZE: usize = 40;
+    pub const HOTBAR_SIZE: usize = 10;
+}
+
 pub mod chunk_data {
     use bevy::prelude::UVec2;
     use bevy_ecs_tilemap::prelude::TilemapTileSize;

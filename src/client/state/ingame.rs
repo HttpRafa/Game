@@ -7,6 +7,8 @@ use crate::client::state::ingame::remote_world::WorldPlugin;
 use bevy::app::App;
 use bevy::prelude::Plugin;
 
+use self::inventory::InventoryPlugin;
+
 mod grid_cursor;
 mod hud;
 mod inventory;
@@ -22,6 +24,7 @@ impl Plugin for InGamePlugin {
         app.add_plugins((
             InGameCameraPlugin,
             WorldPlugin,
+            InventoryPlugin,
             LocalPlayerPlugin,
             RemotePlayerPlugin,
             GridCursorPlugin,
