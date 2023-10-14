@@ -4,12 +4,11 @@ use crate::registry::audio::{GameSounds, UIChannel};
 use bevy::prelude::*;
 use bevy::ui::PositionType;
 use bevy::utils::default;
-use bevy_inspector_egui::prelude::ReflectInspectorOptions;
-use bevy_inspector_egui::InspectorOptions;
 use bevy_kira_audio::{AudioChannel, AudioControl};
 use bevy_rapier2d::parry::utils::Array1;
 
 use super::inventory::player_inventory::PlayerInventory;
+use super::inventory::{spawn_player_slot_child, PlayerSlot, SlotItemTexture};
 
 pub struct HudPlugin;
 
@@ -21,30 +20,25 @@ impl Plugin for HudPlugin {
             .add_systems(
                 Update,
                 handle_hover_and_click.run_if(in_state(GameState::InGame)),
-            )
-            .register_type::<Slot>();
+            );
     }
 }
 
 #[derive(Component)]
 struct Hud;
 
-#[derive(Component, InspectorOptions, Default, Reflect)]
-#[reflect(Component, InspectorOptions)]
-struct Slot(usize);
-
 #[derive(Component)]
-struct ItemTexture;
+struct HotbarSlot;
 
 fn update_items(
-    slots: Query<(&Slot, &Children)>,
+    slots: Query<(&PlayerSlot, &Children)>,
     mut slot_texture: Query<
         (
             &mut Visibility,
             &mut Handle<TextureAtlas>,
             &mut UiTextureAtlasImage,
         ),
-        With<ItemTexture>,
+        With<SlotItemTexture>,
     >,
     player_inventory: Res<PlayerInventory>,
 ) {
@@ -70,7 +64,7 @@ fn update_items(
 }
 
 fn handle_hover_and_click(
-    interaction: Query<(&Interaction, &Children), (Changed<Interaction>, With<Slot>)>,
+    interaction: Query<(&Interaction, &Children), (Changed<Interaction>, With<HotbarSlot>)>,
     mut hotbar_texture: Query<&mut UiTextureAtlasImage>,
     sounds: Res<GameSounds>,
     audio: Res<AudioChannel<UIChannel>>,
@@ -125,46 +119,9 @@ fn setup_hud(mut commands: Commands, textures: Res<GameTextures>) {
                     },
                     Name::new("Hotbar Items"),
                 ))
-                .with_children(|commands| {
+                .with_children(|mut commands| {
                     for x in 0..10 {
-                        commands
-                            .spawn((
-                                ButtonBundle {
-                                    style: Style {
-                                        height: Val::Percent(80.0),
-                                        margin: UiRect::new(
-                                            Val::Px(2.5),
-                                            Val::Px(2.5),
-                                            Val::Px(2.5),
-                                            Val::Px(2.5),
-                                        ),
-                                        justify_content: JustifyContent::Center,
-                                        ..default()
-                                    },
-                                    ..default()
-                                },
-                                Name::new(format!("Slot {}", x)),
-                                Slot(x as usize),
-                            ))
-                            .with_children(|commands| {
-                                commands.spawn(AtlasImageBundle {
-                                    texture_atlas: textures.ui_inventory.atlas_handle.clone(),
-                                    ..default()
-                                });
-                                commands.spawn((
-                                    AtlasImageBundle {
-                                        style: Style {
-                                            position_type: PositionType::Absolute,
-                                            width: Val::Percent(80.0),
-                                            height: Val::Percent(80.0),
-                                            align_self: AlignSelf::Center,
-                                            ..default()
-                                        },
-                                        ..default()
-                                    },
-                                    ItemTexture,
-                                ));
-                            });
+                        spawn_player_slot_child(x, HotbarSlot, &mut commands, &textures);
                     }
                 });
         });

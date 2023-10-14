@@ -1,14 +1,14 @@
 use bevy::prelude::*;
-use bevy_inspector_egui::prelude::ReflectInspectorOptions;
-use bevy_inspector_egui::InspectorOptions;
 
 use crate::{
     client::state::GameState,
     registry::{
-        items::Item,
+        atlas::GameTextures,
         player_data::{HOTBAR_SIZE, INVENTORY_SIZE},
     },
 };
+
+use super::{spawn_player_slot_child, ItemStack};
 
 pub struct PlayerInventoryPlugin;
 
@@ -21,7 +21,7 @@ impl Plugin for PlayerInventoryPlugin {
             .add_systems(OnExit(GameState::InGame), reset_state)
             .add_systems(OnEnter(InventoryState::Opened), setup_screen)
             .add_systems(OnExit(InventoryState::Opened), cleanup_screen)
-            .add_systems(Update, open_inventory.run_if(in_state(GameState::InGame)));
+            .add_systems(Update, handle_input.run_if(in_state(GameState::InGame)));
     }
 }
 
@@ -39,7 +39,7 @@ fn reset_state(mut next_state: ResMut<NextState<InventoryState>>) {
     next_state.set(InventoryState::Closed);
 }
 
-fn open_inventory(
+fn handle_input(
     keyboard: Res<Input<KeyCode>>,
     state: Res<State<InventoryState>>,
     mut next_state: ResMut<NextState<InventoryState>>,
@@ -56,8 +56,30 @@ fn open_inventory(
     }
 }
 
-fn setup_screen(mut _commands: Commands) {
-    info!("Setup player inventory..");
+fn setup_screen(mut commands: Commands, window: Query<&Window>, textures: Res<GameTextures>) {
+    let window = window.single();
+    let screen_size = Vec2::new(window.width() / 2.0, window.height() / 1.75);
+    commands
+        .spawn((
+            NodeBundle {
+                style: Style {
+                    width: Val::Px(screen_size.x),
+                    height: Val::Px(screen_size.y),
+                    top: Val::Px((window.height() / 2.0) - (screen_size.y / 2.0)),
+                    left: Val::Px((window.width() / 2.0) - (screen_size.x / 2.0)),
+                    ..default()
+                },
+                background_color: Color::BLUE.into(),
+                ..default()
+            },
+            Name::new("Player Inventory"),
+            PlayerInventoryScreen,
+        ))
+        .with_children(|mut commands| {
+            for x in 10..INVENTORY_SIZE - 1 {
+                spawn_player_slot_child(x, (), &mut commands, &textures);
+            }
+        });
 }
 
 fn cleanup_screen(mut commands: Commands, screens: Query<Entity, With<PlayerInventoryScreen>>) {
@@ -69,11 +91,4 @@ fn cleanup_screen(mut commands: Commands, screens: Query<Entity, With<PlayerInve
 #[derive(Resource)]
 pub struct PlayerInventory {
     pub slots: Vec<ItemStack>,
-}
-
-#[derive(InspectorOptions, Default, Reflect)]
-#[reflect(InspectorOptions)]
-pub struct ItemStack {
-    pub item: Item,
-    pub amount: u8,
 }
