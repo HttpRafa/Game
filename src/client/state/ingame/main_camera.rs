@@ -5,6 +5,8 @@ use bevy::app::App;
 use bevy::input::mouse::{MouseScrollUnit, MouseWheel};
 use bevy::prelude::*;
 
+use super::InGameData;
+
 pub struct InGameCameraPlugin;
 
 impl Plugin for InGameCameraPlugin {
@@ -42,19 +44,22 @@ fn follow_player(
     player_transform: Query<&Transform, (With<LocalPlayer>, Without<MainCamera>)>,
     window: Query<&Window>,
     time: Res<Time>,
+    ingame_data: Res<InGameData>,
 ) {
     let (camera, global_transform, mut camera_transform) = camera_transform.single_mut();
     let player_position = player_transform.single().translation;
     let window = window.single();
 
     let mut offset = Vec3::ZERO;
-    if let Some(world_position) = window
-        .cursor_position()
-        .and_then(|cursor| camera.viewport_to_world(global_transform, cursor))
-        .map(|ray| ray.origin.truncate())
-    {
-        let world_position = Vec3::new(world_position.x, world_position.y, 0.0);
-        offset = (world_position - player_position) / 15.0;
+    if !ingame_data.screen_open {
+        if let Some(world_position) = window
+            .cursor_position()
+            .and_then(|cursor| camera.viewport_to_world(global_transform, cursor))
+            .map(|ray| ray.origin.truncate())
+        {
+            let world_position = Vec3::new(world_position.x, world_position.y, 0.0);
+            offset = (world_position - player_position) / 15.0;
+        }
     }
 
     camera_transform.translation = camera_transform

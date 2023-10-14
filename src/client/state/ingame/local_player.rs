@@ -91,7 +91,7 @@ fn setup_player(mut commands: Commands, textures: Res<GameTextures>) {
                 gen_animation(&textures.player_animations.atlas_handle, 8, 3, 0.25),
             ],
         },
-        name: Name::new("LocalPlayer"),
+        name: Name::new("Local Player"),
     });
 }
 

@@ -9,6 +9,8 @@ use bevy::utils::default;
 use bevy_inspector_egui::prelude::ReflectInspectorOptions;
 use bevy_inspector_egui::InspectorOptions;
 
+use super::InGameData;
+
 pub struct GridCursorPlugin;
 
 impl Plugin for GridCursorPlugin {
@@ -25,9 +27,10 @@ impl Plugin for GridCursorPlugin {
 pub struct GridCursor;
 
 fn move_cursor(
-    mut cursors: Query<&mut Transform, With<GridCursor>>,
+    mut cursors: Query<(&mut Transform, &mut Visibility), With<GridCursor>>,
     camera: Query<(&Camera, &GlobalTransform), With<MainCamera>>,
     window: Query<&Window>,
+    ingame_data: Res<InGameData>,
 ) {
     let (camera, camera_transform) = camera.single();
     let window = window.single();
@@ -39,8 +42,12 @@ fn move_cursor(
     {
         world_position.x = (world_position.x / TILE_SIZE.x).round() * TILE_SIZE.x;
         world_position.y = (world_position.y / TILE_SIZE.y).round() * TILE_SIZE.y;
-        for mut cursor in &mut cursors {
-            cursor.translation = Vec3::new(world_position.x, world_position.y, 0.0);
+        for (mut cursor, mut visibility) in &mut cursors {
+            if ingame_data.screen_open {
+                *visibility = Visibility::Hidden;
+            } else {
+                cursor.translation = Vec3::new(world_position.x, world_position.y, 0.0);
+            }
         }
     }
 }

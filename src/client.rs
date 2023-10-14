@@ -55,7 +55,7 @@ impl Plugin for ClientPlugin {
         .insert_resource(ItemRegistry::default())
         //.add_plugins((LogDiagnosticsPlugin::default(), FrameTimeDiagnosticsPlugin::default()))
         .add_plugins(
-            WorldInspectorPlugin::default().run_if(input_toggle_active(false, KeyCode::Escape)),
+            WorldInspectorPlugin::default().run_if(input_toggle_active(false, KeyCode::Numpad0)),
         )
         .add_plugins((
             GameAssetPlugin,

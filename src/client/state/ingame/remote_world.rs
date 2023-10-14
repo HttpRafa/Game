@@ -1,12 +1,13 @@
 use bevy::app::App;
+use bevy::input::common_conditions::input_toggle_active;
 use bevy::math::Vec3Swizzles;
-use bevy::prelude::{
-    default, in_state, Commands, DespawnRecursiveExt, Entity, IVec2, IntoSystemConfigs, OnExit,
-    Plugin, Query, Res, ResMut, Resource, Transform, Update, With,
-};
+use bevy::prelude::*;
+use bevy::reflect::Reflect;
 use bevy::utils::HashSet;
 use bevy_ecs_tilemap::prelude::TilemapRenderSettings;
 use bevy_ecs_tilemap::TilemapPlugin;
+use bevy_inspector_egui::prelude::*;
+use bevy_inspector_egui::quick::ResourceInspectorPlugin;
 
 use crate::client::state::ingame::local_player::LocalPlayer;
 use crate::client::state::GameState;
@@ -29,11 +30,16 @@ impl Plugin for WorldPlugin {
             Update,
             spawn_chunks_around_player.run_if(in_state(GameState::InGame)),
         )
-        .add_systems(Update, despawn_chunks.run_if(in_state(GameState::InGame)));
+        .add_systems(Update, despawn_chunks.run_if(in_state(GameState::InGame)))
+        .add_plugins(
+            ResourceInspectorPlugin::<ChunkManager>::default()
+                .run_if(input_toggle_active(false, KeyCode::Numpad2)),
+        );
     }
 }
 
-#[derive(Resource, Default)]
+#[derive(Resource, Reflect, Default, InspectorOptions)]
+#[reflect(Resource, InspectorOptions)]
 struct ChunkManager {
     pub spawned_chunks: HashSet<IVec2>,
 }
