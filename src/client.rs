@@ -37,7 +37,7 @@ impl Plugin for ClientPlugin {
                 .set(ImagePlugin::default_nearest())
                 .set(WindowPlugin {
                     primary_window: Some(Window {
-                        title: "Game".into(),
+                        title: "Game | Dev".into(),
                         ..default()
                     }),
                     ..default()
