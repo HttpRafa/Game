@@ -174,7 +174,7 @@ mod audio {
     }
 
     fn load_audio(mut commands: Commands, asset_server: Res<AssetServer>) {
-        info!("--- [Loading texture files] ---");
+        info!("--- [Loading audio files] ---");
         commands.insert_resource(GameSounds {
             ui_click: asset_server.load("audio/ui/click.ogg"),
             ui_hover: asset_server.load("audio/ui/hover.ogg"),
@@ -199,7 +199,8 @@ trait Identifiable {
 }
 
 fn load_data_from_files<T: DeserializeOwned>(path: &str, registry: &mut HashMap<String, T>) {
-    match fs::read_dir(path) {
+    let path = std::env::current_dir().unwrap().join(path);
+    match fs::read_dir(&path) {
         Ok(files) => {
             for data_file in files {
                 let data_file = data_file.unwrap();
@@ -234,7 +235,7 @@ fn load_data_from_files<T: DeserializeOwned>(path: &str, registry: &mut HashMap<
             }
         }
         Err(_) => {
-            error!("Failed to read data directory {}", path);
+            error!("Failed to read data directory {}", path.display());
         }
     }
 }
