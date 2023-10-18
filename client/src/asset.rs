@@ -1,4 +1,5 @@
 use std::fs;
+use std::path::PathBuf;
 
 use bevy::app::App;
 use bevy::prelude::{error, Plugin};
@@ -193,13 +194,24 @@ mod audio {
     }
 }
 
-trait Identifiable {
-    fn namespace() -> String;
-    fn identifier() -> String;
-}
-
-fn load_data_from_files<T: DeserializeOwned>(path: &str, registry: &mut HashMap<String, T>) {
-    let path = std::env::current_dir().unwrap().join(path);
+fn load_data_from_files<T: DeserializeOwned>(
+    relative_path: &str,
+    registry: &mut HashMap<String, T>,
+) {
+    let mut path = std::env::current_exe().unwrap();
+    match std::env::var("BEVY_ASSET_ROOT") {
+        Ok(value) => {
+            path = PathBuf::from(value);
+        }
+        Err(_) => {}
+    }
+    match std::env::var("CARGO_MANIFEST_DIR") {
+        Ok(value) => {
+            path = PathBuf::from(value);
+        }
+        Err(_) => {}
+    }
+    path = path.join(relative_path);
     match fs::read_dir(&path) {
         Ok(files) => {
             for data_file in files {
