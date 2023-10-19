@@ -13,6 +13,11 @@ jobs:
       matrix:
         target: ["x86_64-unknown-linux-gnu"] #["x86_64-unknown-linux-gnu", "x86_64-pc-windows-gnu"]
     steps:
+      - uses: josStorer/get-current-time@v2
+        id: current-time
+        with:
+          format: YYYYMMDD-HH
+          utcOffset: "+02:00"
       - uses: actions/checkout@v3
      #- uses: ConorMacBride/install-package@v1
      #  with:
@@ -28,27 +33,18 @@ jobs:
           cp -r client/assets/ assets/
           mv target/${{ matrix.target }}/release/client game-client
           mv target/${{ matrix.target }}/release/server game-server
+          zip -9 -r ${{ steps.current-time.outputs.formattedTime }}.zip assets/ game-client game-server
       - name: "Copy windows files"
         if: matrix.target == 'x86_64-pc-windows-gnu'
         run: |
           cp -r client/assets/ assets/
           mv target/${{ matrix.target }}/release/client.exe game-client.exe
           mv target/${{ matrix.target }}/release/server.exe game-server.exe
-      - name: "Upload linux"
-        if: matrix.target == 'x86_64-unknown-linux-gnu'
-        uses: actions/upload-artifact@v3
+          zip -9 -r ${{ steps.current-time.outputs.formattedTime }}.zip assets/ game-client.exe game-server.exe
+      - name: "Upload file"
+        uses: appleboy/discord-action@master
         with:
-          name: linux
-          path: |
-            assets/
-            game-client
-            game-server
-      - name: "Upload windows"
-        if: matrix.target == 'x86_64-pc-windows-gnu'
-        uses: actions/upload-artifact@v3
-        with:
-          name: windows
-          path: |
-            assets/
-            game-client.exe
-            game-server.exe
+          webhook_id: ${{ secrets.WEBHOOK_ID }}
+          webhook_token: ${{ secrets.WEBHOOK_TOKEN }}
+          message: "Finished building game for the platform ${{ matrix.target }}. The push occurred at ${{ steps.current-time.outputs.formattedTime }}"
+          file: "./${{ steps.current-time.outputs.formattedTime }}.zip"
