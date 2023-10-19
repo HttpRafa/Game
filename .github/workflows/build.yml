@@ -16,7 +16,7 @@ jobs:
       - uses: josStorer/get-current-time@v2
         id: current-time
         with:
-          format: YYYYMMDD-HH
+          format: DD-MM-YYYY-hh-mm-ss
           utcOffset: "+02:00"
       - uses: actions/checkout@v3
      #- uses: ConorMacBride/install-package@v1
@@ -46,5 +46,5 @@ jobs:
         with:
           webhook_id: ${{ secrets.WEBHOOK_ID }}
           webhook_token: ${{ secrets.WEBHOOK_TOKEN }}
-          message: "Finished building game for the platform ${{ matrix.target }}. The push occurred at ${{ steps.current-time.outputs.formattedTime }}"
+          message: "Build finished for ${{ matrix.target }}(${{ steps.current-time.outputs.readableTime }})"
           file: "./${{ steps.current-time.outputs.formattedTime }}.zip"
