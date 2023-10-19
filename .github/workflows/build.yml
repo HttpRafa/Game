@@ -26,14 +26,14 @@ jobs:
         if: matrix.target == 'x86_64-unknown-linux-gnu'
         run: |
           cp -r client/assets/ assets/
-          mv target/${{ matrix.target }}/release/client client
-          mv target/${{ matrix.target }}/release/server server
+          mv target/${{ matrix.target }}/release/client game-client
+          mv target/${{ matrix.target }}/release/server game-server
       - name: "Copy windows files"
         if: matrix.target == 'x86_64-pc-windows-gnu'
         run: |
           cp -r client/assets/ assets/
-          mv target/${{ matrix.target }}/release/client.exe client.exe
-          mv target/${{ matrix.target }}/release/server.exe server.exe
+          mv target/${{ matrix.target }}/release/client.exe game-client.exe
+          mv target/${{ matrix.target }}/release/server.exe game-server.exe
       - name: "Upload linux"
         if: matrix.target == 'x86_64-unknown-linux-gnu'
         uses: actions/upload-artifact@v3
@@ -41,8 +41,8 @@ jobs:
           name: linux
           path: |
             assets/
-            client
-            server
+            game-client
+            game-server
       - name: "Upload windows"
         if: matrix.target == 'x86_64-pc-windows-gnu'
         uses: actions/upload-artifact@v3
@@ -50,5 +50,5 @@ jobs:
           name: windows
           path: |
             assets/
-            client.exe
-            server.exe
+            game-client.exe
+            game-server.exe
