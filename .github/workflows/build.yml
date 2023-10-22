@@ -31,20 +31,20 @@ jobs:
         if: matrix.target == 'x86_64-unknown-linux-gnu'
         run: |
           cp -r client/assets/ assets/
-          mv target/${{ matrix.target }}/release/client game-client
-          mv target/${{ matrix.target }}/release/server game-server
-          zip -9 -r ${{ steps.current-time.outputs.formattedTime }}.zip assets/ game-client game-server
+          mv target/${{ matrix.target }}/release/client client-bin
+          mv target/${{ matrix.target }}/release/server server-bin
+          zip -9 -r ${{ steps.current-time.outputs.formattedTime }}.zip assets/ client-bin server-bin
       - name: "Copy windows files"
         if: matrix.target == 'x86_64-pc-windows-gnu'
         run: |
           cp -r client/assets/ assets/
-          mv target/${{ matrix.target }}/release/client.exe game-client.exe
-          mv target/${{ matrix.target }}/release/server.exe game-server.exe
-          zip -9 -r ${{ steps.current-time.outputs.formattedTime }}.zip assets/ game-client.exe game-server.exe
+          mv target/${{ matrix.target }}/release/client.exe client-bin.exe
+          mv target/${{ matrix.target }}/release/server.exe server-bin.exe
+          zip -9 -r ${{ steps.current-time.outputs.formattedTime }}.zip assets/ client-bin.exe server-bin.exe
       - name: "Upload file"
         uses: appleboy/discord-action@master
         with:
           webhook_id: ${{ secrets.WEBHOOK_ID }}
           webhook_token: ${{ secrets.WEBHOOK_TOKEN }}
-          message: "Build finished for ${{ matrix.target }}(${{ steps.current-time.outputs.readableTime }})"
+          message: "Build finished for ${{ matrix.target }} [${{ steps.current-time.outputs.readableTime }}]"
           file: "./${{ steps.current-time.outputs.formattedTime }}.zip"
