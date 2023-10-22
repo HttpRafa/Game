@@ -198,7 +198,7 @@ fn load_data_from_files<T: DeserializeOwned>(
     relative_path: &str,
     registry: &mut HashMap<String, T>,
 ) {
-    let mut path = std::env::current_exe().unwrap();
+    let mut path = std::env::current_dir().unwrap();
     match std::env::var("BEVY_ASSET_ROOT") {
         Ok(value) => {
             path = PathBuf::from(value);
