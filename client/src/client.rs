@@ -1,7 +1,4 @@
-use std::time::Duration;
-
 use bevy::app::App;
-use bevy::asset::ChangeWatcher;
 use bevy::input::common_conditions::input_toggle_active;
 use bevy::prelude::*;
 use bevy::utils::default;
@@ -43,7 +40,7 @@ impl Plugin for ClientPlugin {
                     ..default()
                 })
                 .set(AssetPlugin {
-                    watch_for_changes: ChangeWatcher::with_delay(Duration::from_secs(5)),
+                    watch_for_changes_override: Some(true),
                     ..default()
                 })
                 .build(),

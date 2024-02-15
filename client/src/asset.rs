@@ -2,7 +2,8 @@ use std::fs;
 use std::path::PathBuf;
 
 use bevy::app::App;
-use bevy::prelude::{error, Plugin};
+use bevy::log::error;
+use bevy::prelude::Plugin;
 use bevy::utils::HashMap;
 use serde::de::DeserializeOwned;
 
@@ -20,7 +21,8 @@ impl Plugin for GameAssetPlugin {
 
 mod items {
     use bevy::app::App;
-    use bevy::prelude::{info, Plugin, Res, ResMut, Startup};
+    use bevy::log::info;
+    use bevy::prelude::{Plugin, Res, ResMut, Startup};
     use bevy::utils::HashMap;
     use serde::Deserialize;
 
@@ -65,8 +67,9 @@ mod items {
 
 mod textures {
     use bevy::app::App;
+    use bevy::log::info;
     use bevy::prelude::{
-        info, AssetServer, Assets, Commands, Handle, Image, Plugin, PreStartup, Res, ResMut,
+        AssetServer, Assets, Commands, Handle, Image, Plugin, PreStartup, Res, ResMut,
         Startup, TextureAtlas, Vec2,
     };
     use bevy::utils::HashMap;
@@ -158,7 +161,8 @@ mod textures {
 
 mod audio {
     use bevy::app::App;
-    use bevy::prelude::{info, AssetServer, Commands, Plugin, PreStartup, Res};
+    use bevy::log::info;
+    use bevy::prelude::{AssetServer, Commands, Plugin, PreStartup, Res};
     use bevy_kira_audio::{AudioApp, AudioChannel, AudioControl};
 
     use crate::registry::audio::{BackgroundChannel, GameSounds, SoundEffectsChannel, UIChannel};

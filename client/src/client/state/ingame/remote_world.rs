@@ -4,7 +4,6 @@ use bevy::math::Vec3Swizzles;
 use bevy::prelude::*;
 use bevy::reflect::Reflect;
 use bevy::utils::HashSet;
-use bevy_ecs_tilemap::prelude::TilemapRenderSettings;
 use bevy_ecs_tilemap::TilemapPlugin;
 use bevy_inspector_egui::prelude::*;
 use bevy_inspector_egui::quick::ResourceInspectorPlugin;
@@ -19,22 +18,18 @@ pub struct WorldPlugin;
 
 impl Plugin for WorldPlugin {
     fn build(&self, app: &mut App) {
-        app.insert_resource(TilemapRenderSettings {
-            render_chunk_size: RENDER_CHUNK_SIZE,
-            ..default()
-        })
-        .add_plugins(TilemapPlugin)
-        .insert_resource(ChunkManager::default())
-        .add_systems(OnExit(GameState::InGame), cleanup_chunks)
-        .add_systems(
-            Update,
-            spawn_chunks_around_player.run_if(in_state(GameState::InGame)),
-        )
-        .add_systems(Update, despawn_chunks.run_if(in_state(GameState::InGame)))
-        .add_plugins(
-            ResourceInspectorPlugin::<ChunkManager>::default()
-                .run_if(input_toggle_active(false, KeyCode::Numpad2)),
-        );
+        app.add_plugins(TilemapPlugin)
+            .insert_resource(ChunkManager::default())
+            .add_systems(OnExit(GameState::InGame), cleanup_chunks)
+            .add_systems(
+                Update,
+                spawn_chunks_around_player.run_if(in_state(GameState::InGame)),
+            )
+            .add_systems(Update, despawn_chunks.run_if(in_state(GameState::InGame)))
+            .add_plugins(
+                ResourceInspectorPlugin::<ChunkManager>::default()
+                    .run_if(input_toggle_active(false, KeyCode::Numpad2)),
+            );
     }
 }
 

@@ -1,7 +1,8 @@
 use crate::client::y_sorting::YSort;
 use crate::registry::atlas::GameTextures;
-use crate::registry::chunk_data::{CHUNK_SIZE, TILE_SIZE};
+use crate::registry::chunk_data::{CHUNK_SIZE, RENDER_CHUNK_SIZE, TILE_SIZE};
 use bevy::prelude::*;
+use bevy_ecs_tilemap::map::TilemapRenderSettings;
 use bevy_ecs_tilemap::prelude::{
     TileBundle, TileColor, TilePos, TileStorage, TileTextureIndex, TilemapId, TilemapTexture,
 };
@@ -41,6 +42,10 @@ pub fn spawn_chunk(
     let tilemap_entity = commands
         .spawn((
             chunk,
+            TilemapRenderSettings {
+                render_chunk_size: RENDER_CHUNK_SIZE,
+                ..default()
+            },
             Name::new(format!("Chunk {} {}", chunk_pos.x, chunk_pos.y)),
         ))
         .id();

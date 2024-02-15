@@ -25,7 +25,7 @@ fn scroll_camera(
 ) {
     let mut projection = projection.single_mut();
     let mut movement = 0.0;
-    for event in scroll.iter() {
+    for event in scroll.read() {
         match event.unit {
             MouseScrollUnit::Line => {
                 movement -= event.y;

@@ -5,10 +5,10 @@ edition = "2021"
 
 [dependencies]
 rand = "0.8.5"
-toml = "0.8.2"
+toml = "0.8.10"
 common = { path = "../common" }
-serde = "1.0.188"
-bevy = { version = "0.11.3", default-features = false, features = [
+serde = "1.0.196"
+bevy = { version = "0.12.1", default-features = false, features = [
   "multi-threaded",
   "bevy_asset",
   "bevy_gilrs",
@@ -18,15 +18,14 @@ bevy = { version = "0.11.3", default-features = false, features = [
   "bevy_sprite",
   "bevy_text",
   "bevy_ui",
-  "filesystem_watcher",
   "default_font",
   "png",
   "serialize",
   "x11",
   "wayland",
 ] }
-bevy-inspector-egui = "0.20.0"
+bevy-inspector-egui = "0.22.1"
 bevy-inspector-egui-rapier = "0.9.0"
-bevy_kira_audio = "0.17.0"
-bevy_rapier2d = "0.22.0"
-bevy_ecs_tilemap = { git = "https://github.com/StarArawn/bevy_ecs_tilemap.git" }
+bevy_kira_audio = "0.18.0"
+bevy_rapier2d = "0.24.0"
+bevy_ecs_tilemap = "0.12.0"
